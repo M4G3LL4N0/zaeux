@@ -19,8 +19,12 @@ export default function DashboardPage() {
           </div>
 
           <div className="flex gap-3">
-            <button className="button-secondary">Connect account</button>
-            <button className="button-primary">Add funds</button>
+            <button className="button-secondary px-6 py-3 text-sm tracking-wider rounded-xl hover:bg-white/[0.06] transition-colors">
+              Connect account
+            </button>
+            <button className="button-primary px-6 py-3 text-sm tracking-wider rounded-xl shadow-lg hover:shadow-xl transition-all">
+              Add funds
+            </button>
           </div>
         </div>
 
@@ -87,9 +91,9 @@ export default function DashboardPage() {
               </div>
 
               <div className="mt-8 grid gap-4 md:grid-cols-2">
-                <div className="rounded-[22px] border border-white/10 bg-white/5 p-5">
-                  <div className="text-sm text-[var(--muted)]">Reserve</div>
-                  <div className="mt-2 text-xl font-semibold">Treasury allocation</div>
+                <div className="rounded-[22px] border border-white/10 bg-white/5 p-5 transition-all hover:bg-white/[0.08] hover:border-white/[0.15]">
+                  <div className="text-xs uppercase tracking-[0.1em] text-[var(--muted)]">Reserve</div>
+                  <div className="mt-3 text-xl font-semibold leading-tight">Treasury allocation</div>
                 </div>
                 <div className="rounded-[22px] border border-white/10 bg-white/5 p-5">
                   <div className="text-sm text-[var(--muted)]">Pay</div>
