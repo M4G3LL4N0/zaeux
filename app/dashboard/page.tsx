@@ -10,22 +10,11 @@ export default function DashboardPage() {
   return (
     <main className="min-h-screen px-6 py-8">
       <div className="mx-auto max-w-7xl">
-        <div className="mb-8 flex flex-col justify-between gap-5 md:flex-row md:items-center">
-          <div>
-            <div className="text-sm uppercase tracking-[0.2em] text-[var(--muted)]">
-              Zaeux product preview
-            </div>
-            <h1 className="mt-2 text-5xl font-bold tracking-[-0.06em]">Dashboard</h1>
+        <div className="mb-8">
+          <div className="text-sm uppercase tracking-[0.2em] text-[var(--muted)]">
+            Zaeux product preview
           </div>
-
-          <div className="flex gap-3">
-            <button className="button-secondary px-6 py-3 text-sm tracking-wider rounded-xl hover:bg-white/[0.06] transition-colors">
-              Connect account
-            </button>
-            <button className="button-primary px-6 py-3 text-sm tracking-wider rounded-xl shadow-lg hover:shadow-xl transition-all">
-              Add funds
-            </button>
-          </div>
+          <h1 className="mt-2 text-5xl font-bold tracking-[-0.06em]">Dashboard</h1>
         </div>
 
         <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
