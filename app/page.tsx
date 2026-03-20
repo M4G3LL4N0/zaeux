@@ -61,29 +61,6 @@ const stats = [
 export default function HomePage() {
   return (
     <main className="min-h-screen">
-      <header className="sticky top-0 z-50 nav-blur">
-        <div className="container flex h-18 items-center justify-between py-4">
-          <Link href="/" className="text-xl font-semibold tracking-[-0.08em]">
-            Zaeux
-          </Link>
-
-          <nav className="hidden gap-8 text-sm text-[var(--muted)] md:flex">
-            <a href="#why">Why</a>
-            <a href="#products">Products</a>
-            <a href="#platform">Platform</a>
-            <a href="#cta">Launch</a>
-          </nav>
-
-          <div className="flex items-center gap-3">
-            <Link href="/dashboard" className="button-secondary text-sm">
-              Preview product
-            </Link>
-            <a href="#cta" className="button-primary text-sm">
-              Join waitlist
-            </a>
-          </div>
-        </div>
-      </header>
 
       <section className="relative overflow-hidden">
         <div
