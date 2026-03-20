@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { WaitlistForm } from "../components/WaitlistForm";
 import {
   ArrowRight,
   Building2,
@@ -298,6 +299,8 @@ export default function HomePage() {
               Start with the brand, the product shell, and the story. Then expand
               into real accounts, real treasury products, and real infrastructure.
             </p>
+
+            <WaitlistForm />
 
             <div className="mt-8 flex flex-col gap-4 sm:flex-row">
               <Link href="/dashboard" className="button-primary">
