@@ -194,6 +194,37 @@ a {
   width: 280px;
   border-right: 1px solid var(--border);
   background: rgba(7, 17, 31, 0.8);
+  backdrop-filter: blur(16px);
+}
+
+.sidebar-item {
+  transition: all 0.2s ease;
+}
+
+.sidebar-item:hover {
+  background: rgba(255,255,255,0.03);
+}
+
+.sidebar-item.active {
+  background: rgba(125,211,252,0.1);
+  color: var(--accent);
+}
+
+.account-card-active {
+  box-shadow: 0 0 0 2px var(--accent);
+}
+
+.chart-tooltip {
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 14px;
+}
+
+.chart-axis {
+  color: var(--muted);
+  font-size: 12px;
 }
 
 .dashboard-content {
