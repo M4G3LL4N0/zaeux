@@ -11,6 +11,8 @@ const navItems = [
   { name: "Core", href: "/core" },
   { name: "About", href: "/about" },
   { name: "Dashboard", href: "/dashboard" },
+  { name: "Market", href: "#moment" },
+  { name: "Audience", href: "#audience" },
 ];
 
 export function Nav() {

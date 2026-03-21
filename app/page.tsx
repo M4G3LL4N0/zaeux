@@ -165,6 +165,99 @@ export default function HomePage() {
         </div>
       </section>
 
+      <section id="moment" className="container py-20">
+        <div className="max-w-3xl">
+          <div className="badge">Market moment</div>
+          <h2 className="section-title mt-5">
+            The financial system is ready
+            <br />
+            for its next evolution.
+          </h2>
+          <p className="section-copy mt-6 max-w-2xl">
+            Traditional finance struggles with legacy infrastructure while crypto
+            remains fragmented and inaccessible. Zaeux bridges this gap with a
+            unified platform that combines institutional-grade infrastructure
+            with consumer-friendly design.
+          </p>
+        </div>
+
+        <div className="mt-10 grid gap-6 md:grid-cols-3">
+          <div className="card">
+            <h3 className="text-2xl font-semibold tracking-[-0.04em]">
+              Infrastructure gap
+            </h3>
+            <p className="mt-4 text-base leading-7 text-[var(--muted)]">
+              Legacy systems weren't built for digital-first finance, creating
+              inefficiencies and limiting innovation.
+            </p>
+          </div>
+          <div className="card">
+            <h3 className="text-2xl font-semibold tracking-[-0.04em]">
+              Fragmentation
+            </h3>
+            <p className="mt-4 text-base leading-7 text-[var(--muted)]">
+              Crypto's ecosystem of disjointed tools creates complexity and
+              security risks for users and institutions.
+            </p>
+          </div>
+          <div className="card">
+            <h3 className="text-2xl font-semibold tracking-[-0.04em]">
+              Trust deficit
+            </h3>
+            <p className="mt-4 text-base leading-7 text-[var(--muted)]">
+              Both traditional finance and crypto struggle with transparency and
+              user confidence in their systems.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="audience" className="container py-20">
+        <div className="max-w-3xl">
+          <div className="badge">Built for</div>
+          <h2 className="section-title mt-5">
+            The builders shaping
+            <br />
+            the future of finance.
+          </h2>
+          <p className="section-copy mt-6 max-w-2xl">
+            Zaeux serves forward-thinking individuals and institutions who demand
+            more from their financial systems - clarity, efficiency, and
+            innovation without compromise.
+          </p>
+        </div>
+
+        <div className="mt-10 grid gap-6 md:grid-cols-3">
+          <div className="card">
+            <h3 className="text-2xl font-semibold tracking-[-0.04em]">
+              Financial innovators
+            </h3>
+            <p className="mt-4 text-base leading-7 text-[var(--muted)]">
+              Teams building the next generation of financial products and
+              services.
+            </p>
+          </div>
+          <div className="card">
+            <h3 className="text-2xl font-semibold tracking-[-0.04em]">
+              Institutional pioneers
+            </h3>
+            <p className="mt-4 text-base leading-7 text-[var(--muted)]">
+              Organizations modernizing their financial infrastructure for the
+              digital age.
+            </p>
+          </div>
+          <div className="card">
+            <h3 className="text-2xl font-semibold tracking-[-0.04em]">
+              Empowered individuals
+            </h3>
+            <p className="mt-4 text-base leading-7 text-[var(--muted)]">
+              Users who want control, transparency, and growth from their
+              financial tools.
+            </p>
+          </div>
+        </div>
+      </section>
+
       <section id="why" className="container py-20">
         <div className="max-w-3xl">
           <div className="badge">Why Zaeux</div>
