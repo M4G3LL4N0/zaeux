@@ -356,6 +356,42 @@ export default function HomePage() {
         </div>
       </section>
 
+      <section id="portfolio" className="container py-20">
+        <div className="max-w-3xl">
+          <div className="badge">Portfolio</div>
+          <h2 className="section-title mt-5">
+            Featured startups
+            <br />
+            building the future
+          </h2>
+        </div>
+
+        <div className="mt-10 grid gap-6 md:grid-cols-2">
+          <div className="card relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-[#7dd3fc]/10 to-[#c4b5fd]/10" />
+            <div className="relative z-10">
+              <div className="text-sm uppercase tracking-[0.18em] text-[var(--muted)]">
+                Featured Startup
+              </div>
+              <div className="mt-4 text-3xl font-semibold tracking-[-0.05em]">
+                Zaeux
+              </div>
+              <p className="mt-5 max-w-xl text-base leading-7 text-[var(--muted)]">
+                The onchain financial layer for people, businesses, and institutions.
+              </p>
+              <a
+                href="https://zaeux.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="button-primary mt-6"
+              >
+                Visit Zaeux →
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section id="cta" className="container py-20">
         <div className="card rounded-[36px] p-8 md:p-12">
           <div className="max-w-3xl">

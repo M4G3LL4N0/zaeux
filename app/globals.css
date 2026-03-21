@@ -214,6 +214,19 @@ a {
   box-shadow: 0 0 0 2px var(--accent);
 }
 
+.featured-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.featured-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, var(--accent)/10, var(--accent-2)/10);
+  z-index: 0;
+}
+
 .chart-tooltip {
   background: rgba(255,255,255,0.1);
   backdrop-filter: blur(10px);
