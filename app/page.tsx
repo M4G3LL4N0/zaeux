@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { WaitlistForm } from "../components/WaitlistForm";
+import { WaitlistForm } from "@/components/WaitlistForm";
 import {
   ArrowRight,
   Building2,
