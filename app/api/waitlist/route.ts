@@ -1,13 +1,6 @@
 import { NextResponse } from "next/server";
-
-type WaitlistEntry = {
-  name: string;
-  email: string;
-  company: string;
-  timestamp: number;
-};
-
-let waitlistData: WaitlistEntry[] = [];
+import { supabase } from "@/lib/supabase";
+import { WaitlistEntry } from "@/types/database";
 
 export async function POST(request: Request) {
   const { name, email, company } = await request.json();
@@ -17,18 +10,30 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid data" }, { status: 400 });
   }
 
-  const newEntry: WaitlistEntry = {
-    name,
-    email,
-    company: company || "",
-    timestamp: Date.now()
-  };
+  const { error } = await supabase
+    .from('waitlist')
+    .insert({
+      name,
+      email,
+      company: company || null
+    });
 
-  waitlistData.push(newEntry);
+  if (error) {
+    return NextResponse.json({ error: "Database error" }, { status: 500 });
+  }
 
   return NextResponse.json({ success: true });
 }
 
 export async function GET() {
-  return NextResponse.json(waitlistData);
+  const { data, error } = await supabase
+    .from('waitlist')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    return NextResponse.json({ error: "Database error" }, { status: 500 });
+  }
+
+  return NextResponse.json(data);
 }
