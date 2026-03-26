@@ -51,12 +51,30 @@ export default async function DashboardPage() {
       .insert([{ user_id: session.user.id, email: session.user.email }]);
   }
 
-  // Get accounts
-  const { data: accounts } = await supabase
+  // Get or create default account
+  let { data: accounts } = await supabase
     .from("accounts")
     .select("*")
     .eq("user_id", session.user.id)
     .order("created_at", { ascending: false });
+
+  if (!accounts || accounts.length === 0) {
+    // Create default account
+    const { data: newAccount } = await supabase
+      .from("accounts")
+      .insert([{
+        user_id: session.user.id,
+        name: "Primary Reserve",
+        balance: 0,
+        yield: 0,
+        currency: "USD",
+        card_last_four: "4242"
+      }])
+      .select()
+      .single();
+    
+    accounts = [newAccount];
+  }
 
   // Get recent transactions
   const { data: activity } = await supabase
@@ -65,6 +83,9 @@ export default async function DashboardPage() {
     .eq("user_id", session.user.id)
     .order("created_at", { ascending: false })
     .limit(5);
+
+  // Calculate total balance
+  const totalBalance = accounts.reduce((sum, acc) => sum + acc.balance, 0);
   return (
     <div className="flex min-h-screen">
       {/* Sidebar */}
@@ -140,7 +161,7 @@ export default async function DashboardPage() {
                 ${account.balance.toLocaleString("en-US", { minimumFractionDigits: 2 })}
               </div>
               <div className="mt-2 inline-flex items-center gap-2 text-sm">
-                <span className="text-[var(--success)]">▲ {account.yield}</span>
+                <span className="text-[var(--success)]">▲ {account.yield.toFixed(2)}%</span>
                 <span className="text-[var(--muted)]">APY</span>
               </div>
               <div className="mt-6 pt-4 border-t border-white/5 text-xs uppercase tracking-wider flex items-center justify-between">
@@ -214,7 +235,7 @@ export default async function DashboardPage() {
                 <div>
                   <div className="text-sm text-[var(--muted)]">Total balance</div>
                   <div className="mt-2 text-6xl font-bold tracking-[-0.07em]">
-                    $128,420.78
+                    ${totalBalance.toLocaleString("en-US", { minimumFractionDigits: 2 })}
                   </div>
                   <div className="mt-4 text-sm text-[var(--success)]">
                     +4.82% reserve performance
