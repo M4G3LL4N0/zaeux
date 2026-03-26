@@ -1,4 +1,4 @@
-import { ArrowUpRight, BarChart2, Bell, CreditCard, Home, LineChart, Mail, PieChart, Settings, Shield, TrendingUp, User, Wallet } from "lucide-react";
+import { ArrowUpRight, BarChart2 as BarChart3, Bell, CreditCard, Home, LineChart, Mail, PieChart, Settings, Shield, TrendingUp, User, Wallet } from "lucide-react";
 
 const navItems = [
   { name: "Dashboard", icon: Home },
