@@ -24,7 +24,47 @@ const accounts = [
   { name: "Cash Buffer", balance: "$2,092.95", yield: "1.25%", cardLastFour: "3987" },
 ];
 
-export default function DashboardPage() {
+import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+
+export default async function DashboardPage() {
+  const supabase = createServerComponentClient({ cookies });
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
+  if (!session) {
+    redirect("/login");
+  }
+
+  // Ensure profile exists
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("*")
+    .eq("user_id", session.user.id)
+    .single();
+
+  if (!profile) {
+    await supabase
+      .from("profiles")
+      .insert([{ user_id: session.user.id, email: session.user.email }]);
+  }
+
+  // Get accounts
+  const { data: accounts } = await supabase
+    .from("accounts")
+    .select("*")
+    .eq("user_id", session.user.id)
+    .order("created_at", { ascending: false });
+
+  // Get recent transactions
+  const { data: activity } = await supabase
+    .from("transactions")
+    .select("*")
+    .eq("user_id", session.user.id)
+    .order("created_at", { ascending: false })
+    .limit(5);
   return (
     <div className="flex min-h-screen">
       {/* Sidebar */}
@@ -78,7 +118,7 @@ export default function DashboardPage() {
 
         {/* Account Cards */}
         <div className="grid gap-6 mb-8 md:grid-cols-3">
-          {accounts.map((account, i) => (
+          {accounts?.map((account, i) => (
             <div 
               key={i} 
               className={`account-card p-6 transition-all ${i === 0 ? 'account-card-active' : ''}`}
@@ -97,7 +137,7 @@ export default function DashboardPage() {
                 </div>
               </div>
               <div className="text-3xl font-bold tracking-tight">
-                {account.balance}
+                ${account.balance.toLocaleString("en-US", { minimumFractionDigits: 2 })}
               </div>
               <div className="mt-2 inline-flex items-center gap-2 text-sm">
                 <span className="text-[var(--success)]">▲ {account.yield}</span>
@@ -257,7 +297,7 @@ export default function DashboardPage() {
                 <button className="text-sm text-[var(--accent)]">View All</button>
               </div>
               <div className="space-y-3">
-                {activity.map((item) => (
+                {activity?.map((item) => (
                   <a
                     href="#"
                     key={`${item.label}-${item.time}`}
