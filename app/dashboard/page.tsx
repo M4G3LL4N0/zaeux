@@ -10,13 +10,6 @@ const navItems = [
   { name: "Settings", icon: Settings },
 ];
 
-const activity = [
-  { label: "Reserve sweep", amount: "+$482.12", time: "2 mins ago", type: "deposit" },
-  { label: "Global transfer", amount: "-$1,240.00", time: "30 mins ago", type: "withdrawal" }, 
-  { label: "Membership allocation", amount: "+$120.00", time: "Yesterday", type: "deposit" },
-  { label: "Dividend payment", amount: "+$42.50", time: "Yesterday", type: "deposit" },
-  { label: "Coffee purchase", amount: "-$4.25", time: "Mar 19", type: "withdrawal" },
-];
 
 const accounts = [
   { name: "Primary Reserve", balance: "$84,213.54", yield: "4.82%", cardLastFour: "4242" },  
@@ -77,12 +70,25 @@ export default async function DashboardPage() {
   }
 
   // Get recent transactions
-  const { data: activity } = await supabase
+  const { data: transactions } = await supabase
     .from("transactions")
     .select("*")
     .eq("user_id", session.user.id)
     .order("created_at", { ascending: false })
     .limit(5);
+
+  // Format transactions for UI
+  const activity = transactions?.map((tx) => ({
+    label: tx.description || tx.type === 'credit' ? 'Deposit' : 'Withdrawal',
+    amount: `${tx.type === 'credit' ? '+' : '-'}$${tx.amount.toFixed(2)}`,
+    time: new Date(tx.created_at).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    }),
+    type: tx.type === 'credit' ? 'deposit' : 'withdrawal'
+  })) || [];
 
   // Calculate total balance
   const totalBalance = accounts.reduce((sum, acc) => sum + acc.balance, 0);
