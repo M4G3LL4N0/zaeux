@@ -17,19 +17,26 @@ const accounts = [
   { name: "Cash Buffer", balance: "$2,092.95", yield: "1.25%", cardLastFour: "3987" },
 ];
 
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
+"use client";
 
-export default async function DashboardPage() {
-  const supabase = createServerComponentClient({ cookies });
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase";
 
-  if (!session) {
-    redirect("/login");
-  }
+export default function DashboardPage() {
+  const router = useRouter();
+  const [session, setSession] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setLoading(false);
+      if (!session) {
+        router.push("/login");
+      }
+    });
+  }, [router]);
 
   // Ensure profile exists
   const { data: profile } = await supabase

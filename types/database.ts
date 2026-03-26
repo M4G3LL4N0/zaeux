@@ -1,4 +1,4 @@
-export type WaitlistEntry = {
+export interface WaitlistEntry {
   full_name?: string | null;
   email: string;
   company?: string | null;

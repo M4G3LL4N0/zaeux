@@ -5,6 +5,8 @@ import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 import { Button } from "./ui/button";
 
+"use client";
+
 export function AuthForm() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
