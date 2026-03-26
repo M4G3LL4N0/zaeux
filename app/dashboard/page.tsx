@@ -27,62 +27,81 @@ export default function DashboardPage() {
   const router = useRouter();
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [profile, setProfile] = useState(null);
+  const [accounts, setAccounts] = useState([]);
+  const [transactions, setTransactions] = useState([]);
+  const [totalBalance, setTotalBalance] = useState(0);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setLoading(false);
+    const loadData = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
         router.push("/login");
+        return;
       }
-    });
+      setSession(session);
+
+      // Load profile
+      const { data: profileData } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", session.user.id)
+        .single();
+      
+      if (!profileData) {
+        const { data: newProfile } = await supabase
+          .from("profiles")
+          .insert([{ id: session.user.id, email: session.user.email }])
+          .select()
+          .single();
+        setProfile(newProfile);
+      } else {
+        setProfile(profileData);
+      }
+
+      // Load accounts
+      const { data: accountsData } = await supabase
+        .from("accounts")
+        .select("*")
+        .eq("user_id", session.user.id)
+        .order("created_at", { ascending: false });
+
+      if (!accountsData || accountsData.length === 0) {
+        const { data: newAccount } = await supabase
+          .from("accounts")
+          .insert([{
+            user_id: session.user.id,
+            name: "Primary Reserve",
+            balance: 0,
+            yield: 0,
+            currency: "USD",
+            card_last_four: "4242"
+          }])
+          .select()
+          .single();
+        setAccounts([newAccount]);
+      } else {
+        setAccounts(accountsData);
+      }
+
+      // Load transactions
+      const { data: transactionsData } = await supabase
+        .from("transactions")
+        .select("*")
+        .eq("user_id", session.user.id)
+        .order("created_at", { ascending: false })
+        .limit(5);
+      setTransactions(transactionsData || []);
+
+      // Calculate total balance
+      const balance = accountsData?.reduce((sum, acc) => sum + acc.balance, 0) || 0;
+      setTotalBalance(balance);
+
+      setLoading(false);
+    };
+
+    loadData();
   }, [router]);
-
-  // Ensure profile exists
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("user_id", session.user.id)
-    .single();
-
-  if (!profile) {
-    await supabase
-      .from("profiles")
-      .insert([{ user_id: session.user.id, email: session.user.email }]);
-  }
-
-  // Get or create default account
-  let { data: accounts } = await supabase
-    .from("accounts")
-    .select("*")
-    .eq("user_id", session.user.id)
-    .order("created_at", { ascending: false });
-
-  if (!accounts || accounts.length === 0) {
-    // Create default account
-    const { data: newAccount } = await supabase
-      .from("accounts")
-      .insert([{
-        user_id: session.user.id,
-        name: "Primary Reserve",
-        balance: 0,
-        yield: 0,
-        currency: "USD",
-        card_last_four: "4242"
-      }])
-      .select()
-      .single();
-    
-    accounts = [newAccount];
-  }
-
-  // Get recent transactions
-  const { data: transactions } = await supabase
-    .from("transactions")
-    .select("*")
-    .eq("user_id", session.user.id)
-    .order("created_at", { ascending: false })
-    .limit(5);
 
   // Format transactions for UI
   const activity = transactions?.map((tx) => ({
@@ -96,9 +115,6 @@ export default function DashboardPage() {
     }),
     type: tx.type === 'credit' ? 'deposit' : 'withdrawal'
   })) || [];
-
-  // Calculate total balance
-  const totalBalance = accounts.reduce((sum, acc) => sum + acc.balance, 0);
   return (
     <div className="flex min-h-screen">
       {/* Sidebar */}
