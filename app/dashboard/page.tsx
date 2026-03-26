@@ -290,7 +290,7 @@ export default function DashboardPage() {
             </div>
           </aside>
         </div>
-      </div>
-    </main>
+      </main>
+    </div>
   );
 }
