@@ -15,8 +15,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${fonts.variable} scroll-smooth`}>
-      <body>
+    <html lang="en" className="scroll-smooth">
+      <body className={fonts.className}>
         <Nav />
         {children}
       </body>
