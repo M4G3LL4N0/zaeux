@@ -3,19 +3,18 @@ import { supabase } from "@/lib/supabase";
 import { WaitlistEntry } from "@/types/database";
 
 export async function POST(request: Request) {
-  const { name, email, company } = await request.json();
+  const { email } = await request.json();
 
-  // Simple validation
-  if (!name || !email || !email.includes("@")) {
-    return NextResponse.json({ error: "Invalid data" }, { status: 400 });
+  // Validation
+  if (!email || !email.includes("@")) {
+    return NextResponse.json({ error: "Please enter a valid email" }, { status: 400 });
   }
 
   const { error } = await supabase
     .from('waitlist')
     .insert({
-      name,
       email,
-      company: company || null
+      created_at: new Date().toISOString()
     });
 
   if (error) {

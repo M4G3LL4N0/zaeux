@@ -14,23 +14,26 @@ import { supabase } from "@/lib/supabase";
 type AccountRow = {
   id: string;
   user_id: string;
-  account_type?: string | null;
-  currency?: string | null;
-  balance?: string | number | null;
-  yield_earned?: string | number | null;
-  status?: string | null;
+  account_type: string;
+  currency: string;
+  balance: number;
+  yield_earned: number;
+  status: string;
+  created_at: string;
+  updated_at: string;
 };
 
 type TransactionRow = {
   id: string;
   user_id: string;
-  account_id?: string | null;
-  amount?: string | number | null;
-  currency?: string | null;
-  type?: string | null;
-  status?: string | null;
-  description?: string | null;
-  created_at?: string | null;
+  account_id: string;
+  amount: number;
+  currency: string;
+  type: 'credit' | 'debit';
+  status: string;
+  description: string | null;
+  metadata: Record<string, unknown> | null;
+  created_at: string;
 };
 
 export default function DashboardPage() {
@@ -101,7 +104,7 @@ export default function DashboardPage() {
 
         const { data: accountRows, error: accountsError } = await supabase
           .from("accounts")
-          .select("*")
+          .select("id, user_id, account_type, currency, balance, yield_earned, status, created_at, updated_at")
           .eq("user_id", user.id)
           .order("created_at", { ascending: false });
 
@@ -135,7 +138,7 @@ export default function DashboardPage() {
 
         const { data: transactionRows, error: transactionsError } = await supabase
           .from("transactions")
-          .select("*")
+          .select("id, user_id, account_id, amount, currency, type, status, description, created_at")
           .eq("user_id", user.id)
           .order("created_at", { ascending: false })
           .limit(8);
@@ -150,7 +153,10 @@ export default function DashboardPage() {
         setTransactions(transactionRows ?? []);
       } catch (err) {
         if (!isMounted) return;
-        setError(err instanceof Error ? err.message : "Failed to load dashboard.");
+        const message = err instanceof Error ? err.message : "Failed to load dashboard";
+        console.error("Dashboard error:", message);
+        setError(message);
+        router.push("/login");
       } finally {
         if (isMounted) {
           setLoading(false);
