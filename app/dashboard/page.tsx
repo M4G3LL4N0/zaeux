@@ -233,27 +233,18 @@ export default function DashboardPage() {
   }
 
   return (
-    <main className="min-h-screen px-6 py-8">
-      <div className="mx-auto max-w-7xl">
-        <div className="mb-8 flex flex-col justify-between gap-5 md:flex-row md:items-center">
-          <div>
-            <div className="text-sm uppercase tracking-[0.2em] text-[var(--muted)]">
-              Zaeux dashboard
-            </div>
-            <h1 className="mt-2 text-5xl font-bold tracking-[-0.06em]">Overview</h1>
-            {email ? (
-              <div className="mt-3 text-sm text-[var(--muted)]">{email}</div>
-            ) : null}
+    <main className="min-h-screen bg-black/50">
+      <DashboardSidebar />
+      <DashboardHeader email={email} />
+      
+      <div className="md:pl-64">
+        <div className="pt-16">
+          <div className="container px-6 py-8">
+        <div className="mb-8">
+          <div className="text-sm uppercase tracking-[0.2em] text-[var(--muted)]">
+            Zaeux dashboard
           </div>
-
-          <div className="flex gap-3">
-            <button className="button-secondary" onClick={() => router.push("/")}>
-              Back to site
-            </button>
-            <button className="button-primary" onClick={handleSignOut}>
-              Sign out
-            </button>
-          </div>
+          <h1 className="mt-2 text-5xl font-bold tracking-[-0.06em]">Overview</h1>
         </div>
 
         {error ? (
@@ -262,9 +253,9 @@ export default function DashboardPage() {
           </div>
         ) : null}
 
-        <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
+        <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr]">
           <section className="grid gap-6">
-            <div className="card rounded-[32px] p-7">
+            <div className="card rounded-2xl p-6">
               <div className="flex items-start justify-between">
                 <div>
                   <div className="text-sm text-[var(--muted)]">Total balance</div>
@@ -289,8 +280,8 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            <div className="grid gap-6 md:grid-cols-3">
-              <div className="card">
+            <div className="grid gap-6 md:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3">
+              <div className="card rounded-2xl p-5">
                 <div className="mb-4 inline-flex rounded-2xl border border-white/10 bg-white/5 p-3">
                   <BarChart3 size={20} />
                 </div>
@@ -323,7 +314,7 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            <div className="card rounded-[32px] p-7">
+            <div className="card rounded-2xl p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <div className="text-sm text-[var(--muted)]">Primary account</div>
@@ -334,8 +325,8 @@ export default function DashboardPage() {
                 <ArrowUpRight />
               </div>
 
-              <div className="mt-8 grid gap-4 md:grid-cols-2">
-                <div className="rounded-[22px] border border-white/10 bg-white/5 p-5">
+              <div className="mt-6 grid gap-4 md:grid-cols-2">
+                <div className="card rounded-xl p-4">
                   <div className="text-sm text-[var(--muted)]">Status</div>
                   <div className="mt-2 text-xl font-semibold">
                     {primaryAccount?.status ?? "active"}
@@ -370,7 +361,7 @@ export default function DashboardPage() {
           </section>
 
           <aside className="grid gap-6">
-            <div className="card rounded-[32px] p-7">
+            <div className="card rounded-2xl p-6">
               <div className="text-sm text-[var(--muted)]">Recent activity</div>
               <div className="mt-5 space-y-4">
                 {transactions.length > 0 ? (
@@ -409,7 +400,7 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            <div className="card rounded-[32px] p-7">
+            <div className="card rounded-2xl p-6">
               <div className="text-sm text-[var(--muted)]">Next steps</div>
               <ul className="mt-5 space-y-3 text-sm leading-6 text-[var(--muted)]">
                 <li>• Add wallet connection or magic-link auth polish</li>
@@ -419,6 +410,7 @@ export default function DashboardPage() {
               </ul>
             </div>
           </aside>
+          </div>
         </div>
       </div>
     </main>
