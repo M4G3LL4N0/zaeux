@@ -1,273 +1,280 @@
-import { ArrowUpRight, BarChart2 as BarChart3, Bell, CreditCard, Home, LineChart, Mail, PieChart, Settings, Shield, TrendingUp, User, Wallet } from "lucide-react";
-
-const navItems = [
-  { name: "Dashboard", icon: Home },
-  { name: "Accounts", icon: Wallet },
-  { name: "Payments", icon: CreditCard },
-  { name: "Invest", icon: TrendingUp },
-  { name: "Cards", icon: CreditCard },
-  { name: "Profile", icon: User },
-  { name: "Settings", icon: Settings },
-];
-
-
-const accounts = [
-  { name: "Primary Reserve", balance: "$84,213.54", yield: "4.82%", cardLastFour: "4242" },  
-  { name: "Global Treasury", balance: "$42,014.29", yield: "3.94%", cardLastFour: "5532" },
-  { name: "Cash Buffer", balance: "$2,092.95", yield: "1.25%", cardLastFour: "3987" },
-];
-
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import {
+  ArrowUpRight,
+  BarChart3,
+  CreditCard,
+  Shield,
+  Wallet,
+} from "lucide-react";
 import { supabase } from "@/lib/supabase";
+
+type AccountRow = {
+  id: string;
+  user_id: string;
+  account_type?: string | null;
+  currency?: string | null;
+  balance?: string | number | null;
+  yield_earned?: string | number | null;
+  status?: string | null;
+};
+
+type TransactionRow = {
+  id: string;
+  user_id: string;
+  account_id?: string | null;
+  amount?: string | number | null;
+  currency?: string | null;
+  type?: string | null;
+  status?: string | null;
+  description?: string | null;
+  created_at?: string | null;
+};
 
 export default function DashboardPage() {
   const router = useRouter();
-  const [session, setSession] = useState(null);
+
   const [loading, setLoading] = useState(true);
-  const [profile, setProfile] = useState(null);
-  const [accounts, setAccounts] = useState([]);
-  const [transactions, setTransactions] = useState([]);
-  const [totalBalance, setTotalBalance] = useState(0);
+  const [isAuthed, setIsAuthed] = useState(false);
+  const [email, setEmail] = useState<string>("");
+  const [accounts, setAccounts] = useState<AccountRow[]>([]);
+  const [transactions, setTransactions] = useState<TransactionRow[]>([]);
+  const [error, setError] = useState<string>("");
 
   useEffect(() => {
-    const loadData = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        router.push("/login");
-        return;
-      }
-      setSession(session);
+    let isMounted = true;
 
-      // Load profile
-      const { data: profileData } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", session.user.id)
-        .single();
-      
-      if (!profileData) {
-        const { data: newProfile } = await supabase
+    async function loadDashboard() {
+      try {
+        setLoading(true);
+        setError("");
+
+        const {
+          data: { user },
+          error: userError,
+        } = await supabase.auth.getUser();
+
+        if (userError) {
+          throw userError;
+        }
+
+        if (!user) {
+          if (isMounted) {
+            setIsAuthed(false);
+            setAccounts([]);
+            setTransactions([]);
+            setEmail("");
+          }
+          return;
+        }
+
+        if (!isMounted) return;
+
+        setIsAuthed(true);
+        setEmail(user.email ?? "");
+
+        const { data: existingProfile, error: profileError } = await supabase
           .from("profiles")
-          .insert([{ id: session.user.id, email: session.user.email }])
-          .select()
-          .single();
-        setProfile(newProfile);
-      } else {
-        setProfile(profileData);
-      }
+          .select("id")
+          .eq("id", user.id)
+          .maybeSingle();
 
-      // Load accounts
-      const { data: accountsData } = await supabase
-        .from("accounts")
-        .select("*")
-        .eq("user_id", session.user.id)
-        .order("created_at", { ascending: false });
+        if (profileError) {
+          throw profileError;
+        }
 
-      if (!accountsData || accountsData.length === 0) {
-        const { data: newAccount } = await supabase
+        if (!existingProfile) {
+          const { error: insertProfileError } = await supabase.from("profiles").insert([
+            {
+              id: user.id,
+              email: user.email ?? null,
+              display_name: user.user_metadata?.display_name ?? null,
+            },
+          ]);
+
+          if (insertProfileError) {
+            throw insertProfileError;
+          }
+        }
+
+        const { data: accountRows, error: accountsError } = await supabase
           .from("accounts")
-          .insert([{
-            user_id: session.user.id,
-            name: "Primary Reserve",
-            balance: 0,
-            yield: 0,
-            currency: "USD",
-            card_last_four: "4242"
-          }])
-          .select()
-          .single();
-        setAccounts([newAccount]);
-      } else {
-        setAccounts(accountsData);
+          .select("*")
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: false });
+
+        if (accountsError) {
+          throw accountsError;
+        }
+
+        let resolvedAccounts = accountRows ?? [];
+
+        if (resolvedAccounts.length === 0) {
+          const { data: insertedAccounts, error: createAccountError } = await supabase
+            .from("accounts")
+            .insert([
+              {
+                user_id: user.id,
+                account_type: "primary",
+                currency: "USD",
+                balance: 0,
+                yield_earned: 0,
+                status: "active",
+              },
+            ])
+            .select("*");
+
+          if (createAccountError) {
+            throw createAccountError;
+          }
+
+          resolvedAccounts = insertedAccounts ?? [];
+        }
+
+        const { data: transactionRows, error: transactionsError } = await supabase
+          .from("transactions")
+          .select("*")
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: false })
+          .limit(8);
+
+        if (transactionsError) {
+          throw transactionsError;
+        }
+
+        if (!isMounted) return;
+
+        setAccounts(resolvedAccounts);
+        setTransactions(transactionRows ?? []);
+      } catch (err) {
+        if (!isMounted) return;
+        setError(err instanceof Error ? err.message : "Failed to load dashboard.");
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
       }
+    }
 
-      // Load transactions
-      const { data: transactionsData } = await supabase
-        .from("transactions")
-        .select("*")
-        .eq("user_id", session.user.id)
-        .order("created_at", { ascending: false })
-        .limit(5);
-      setTransactions(transactionsData || []);
+    loadDashboard();
 
-      // Calculate total balance
-      const balance = accountsData?.reduce((sum, acc) => sum + acc.balance, 0) || 0;
-      setTotalBalance(balance);
-
-      setLoading(false);
+    return () => {
+      isMounted = false;
     };
+  }, []);
 
-    loadData();
-  }, [router]);
+  const primaryAccount = accounts[0];
 
-  // Format transactions for UI
-  const activity = transactions?.map((tx) => ({
-    label: tx.description || tx.type === 'credit' ? 'Deposit' : 'Withdrawal',
-    amount: `${tx.type === 'credit' ? '+' : '-'}$${tx.amount.toFixed(2)}`,
-    time: new Date(tx.created_at).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    }),
-    type: tx.type === 'credit' ? 'deposit' : 'withdrawal'
-  })) || [];
-  return (
-    <div className="flex min-h-screen">
-      {/* Sidebar */}
-      <aside className="dashboard-sidebar sticky top-0 h-screen hidden lg:block">
-        <div className="p-6 border-b border-white/5">
-          <div className="text-xl font-semibold tracking-tight">Zaeux</div>
-          <div className="mt-1 text-xs text-[var(--muted)]">Private Dashboard</div>
-        </div>
-        <nav className="mt-4 px-3">
-          <ul className="space-y-1">
-            {navItems.map((item) => (
-              <li key={item.name}>
-                <a 
-                  href="#" 
-                  className={`sidebar-item flex items-center gap-3 rounded-lg px-4 py-3 text-[var(--muted)] ${item.name === 'Dashboard' ? 'active' : ''}`}
-                >
-                  <item.icon size={18} />
-                  <span>{item.name}</span>
-                </a>
-              </li>
-            ))}
-          </ul>
-        </nav>
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-white/5">
-          <div className="text-xs text-[var(--muted)] mb-2">Account Overview</div>
-          <div className="flex items-center gap-3 px-3 py-2 text-sm rounded-lg bg-white/[0.03]">
-            <div className="w-2 h-2 rounded-full bg-[var(--success)]"></div>
-            <span>Active</span>
+  const totalBalance = useMemo(() => {
+    return accounts.reduce((sum, account) => {
+      return sum + Number(account.balance ?? 0);
+    }, 0);
+  }, [accounts]);
+
+  const totalYield = useMemo(() => {
+    return accounts.reduce((sum, account) => {
+      return sum + Number(account.yield_earned ?? 0);
+    }, 0);
+  }, [accounts]);
+
+  async function handleSignOut() {
+    await supabase.auth.signOut();
+    router.push("/login");
+    router.refresh();
+  }
+
+  if (loading) {
+    return (
+      <main className="min-h-screen px-6 py-8">
+        <div className="mx-auto max-w-7xl">
+          <div className="card rounded-[32px] p-7">
+            <div className="text-sm text-[var(--muted)]">Zaeux dashboard</div>
+            <h1 className="mt-3 text-4xl font-bold tracking-[-0.06em]">Loading account…</h1>
           </div>
         </div>
-      </aside>
+      </main>
+    );
+  }
 
-      {/* Main Content */}
-      <main className="dashboard-content">
-        <div className="flex items-center justify-between mb-8">
+  if (!isAuthed) {
+    return (
+      <main className="min-h-screen px-6 py-8">
+        <div className="mx-auto max-w-5xl">
+          <div className="card rounded-[32px] p-8 md:p-10">
+            <div className="text-sm uppercase tracking-[0.2em] text-[var(--muted)]">
+              Zaeux product preview
+            </div>
+            <h1 className="mt-3 text-5xl font-bold tracking-[-0.06em]">
+              Sign in to access your dashboard
+            </h1>
+            <p className="mt-5 max-w-2xl text-base leading-7 text-[var(--muted)]">
+              Your live account, balances, and transaction activity appear here once you log in.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-4">
+              <button className="button-primary" onClick={() => router.push("/login")}>
+                Go to login
+              </button>
+              <button className="button-secondary" onClick={() => router.push("/")}>
+                Back to homepage
+              </button>
+            </div>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
+  return (
+    <main className="min-h-screen px-6 py-8">
+      <div className="mx-auto max-w-7xl">
+        <div className="mb-8 flex flex-col justify-between gap-5 md:flex-row md:items-center">
           <div>
             <div className="text-sm uppercase tracking-[0.2em] text-[var(--muted)]">
-              Summary
+              Zaeux dashboard
             </div>
-            <h1 className="mt-1 text-3xl font-bold tracking-tight">Dashboard</h1>
+            <h1 className="mt-2 text-5xl font-bold tracking-[-0.06em]">Overview</h1>
+            {email ? (
+              <div className="mt-3 text-sm text-[var(--muted)]">{email}</div>
+            ) : null}
           </div>
+
           <div className="flex gap-3">
-            <button className="button-secondary !px-4 !py-2 text-sm">
-              <Bell size={18} />
+            <button className="button-secondary" onClick={() => router.push("/")}>
+              Back to site
             </button>
-            <button className="button-secondary !px-4 !py-2 text-sm">
-              <Mail size={18} />
+            <button className="button-primary" onClick={handleSignOut}>
+              Sign out
             </button>
           </div>
         </div>
 
-        {/* Account Cards */}
-        <div className="grid gap-6 mb-8 md:grid-cols-3">
-          {accounts?.map((account, i) => (
-            <div 
-              key={i} 
-              className={`account-card p-6 transition-all ${i === 0 ? 'account-card-active' : ''}`}
-            >
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="font-medium flex items-center gap-2">
-                  {account.name}
-                  {i === 0 && (
-                    <span className="text-xs px-2 py-1 rounded-full bg-[var(--accent)]/10 text-[var(--accent)]">
-                      Primary
-                    </span>
-                  )}
-                </h3>
-                <div className="rounded-full bg-white/5 p-2">
-                  <Wallet size={16} />
-                </div>
-              </div>
-              <div className="text-3xl font-bold tracking-tight">
-                ${account.balance.toLocaleString("en-US", { minimumFractionDigits: 2 })}
-              </div>
-              <div className="mt-2 inline-flex items-center gap-2 text-sm">
-                <span className="text-[var(--success)]">▲ {account.yield.toFixed(2)}%</span>
-                <span className="text-[var(--muted)]">APY</span>
-              </div>
-              <div className="mt-6 pt-4 border-t border-white/5 text-xs uppercase tracking-wider flex items-center justify-between">
-                <span>•••• •••• •••• {account.cardLastFour}</span>
-                <span>{i === 0 ? 'Active' : 'Linked'}</span>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Chart Section */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h2 className="text-xl font-semibold">Performance</h2>
-              <p className="text-sm text-[var(--muted)] mt-1">
-                Quarterly reserve performance
-              </p>
-            </div>
-            <div className="flex gap-2">
-              <button className="button-secondary !px-3 !py-1 text-xs">
-                1M %
-              </button>
-              <button className="button-secondary !px-3 !py-1 text-xs">
-                6M %
-              </button>
-              <button className="button-secondary !px-3 !py-1 text-xs">
-                12M %
-              </button>
-            </div>
+        {error ? (
+          <div className="mb-6 card rounded-[24px] p-5">
+            <div className="text-sm text-red-300">{error}</div>
           </div>
-          <div className="chart-placeholder relative">
-            <div className="absolute top-4 left-4">
-              <div className="text-sm font-medium">Reserve balance (USD)</div>
-              <div className="text-2xl font-bold mt-1">$84,213<span className="text-[var(--success)]">.54</span></div>
-              <div className="text-xs text-[var(--muted)] mt-1">30-day history</div>
-            </div>
+        ) : null}
 
-            <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between">
-              <div className="chart-axis">Jan 1</div>
-              <div className="chart-axis">Jan 15</div>
-              <div className="chart-axis">Feb 1</div>
-              <div className="chart-axis">Feb 15</div>
-              <div className="chart-axis">Mar 1</div>
-            </div>
-
-            {/* Simulated chart line with points */}
-            <svg width="100%" height="100%" className="absolute inset-0">
-              <path 
-                d="M 40 180 C 80 120, 140 140, 180 100 C 220 60, 280 80, 320 40" 
-                stroke="var(--accent)" 
-                strokeWidth="2" 
-                fill="none"
-              />
-              {[40,80,140,180,220,280,320].map((x,i) => (
-                <circle key={i} cx={x} cy={i % 2 === 0 ? 180 - (i*20) : 180 - (i*15)} r="3" fill="var(--accent)" />
-              ))}
-            </svg>
-            
-            <div className="chart-tooltip absolute" style={{top: '40%', right: '30%'}}>
-              <div className="text-xs">Performance spike</div>
-              <div className="font-bold">+5.2%</div>
-            </div>
-          </div>
-        </div>
-
-        <div className="grid gap-6 lg:grid-cols-[3fr_2fr]">
+        <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
           <section className="grid gap-6">
             <div className="card rounded-[32px] p-7">
               <div className="flex items-start justify-between">
                 <div>
                   <div className="text-sm text-[var(--muted)]">Total balance</div>
                   <div className="mt-2 text-6xl font-bold tracking-[-0.07em]">
-                    ${totalBalance.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                    $
+                    {totalBalance.toLocaleString(undefined, {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
                   </div>
                   <div className="mt-4 text-sm text-[var(--success)]">
-                    +4.82% reserve performance
+                    Yield earned: $
+                    {totalYield.toLocaleString(undefined, {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
                   </div>
                 </div>
                 <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
@@ -283,7 +290,11 @@ export default function DashboardPage() {
                 </div>
                 <div className="text-sm text-[var(--muted)]">Yield earned</div>
                 <div className="mt-2 text-3xl font-semibold tracking-[-0.05em]">
-                  $2,184.33
+                  $
+                  {totalYield.toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
                 </div>
               </div>
 
@@ -291,9 +302,9 @@ export default function DashboardPage() {
                 <div className="mb-4 inline-flex rounded-2xl border border-white/10 bg-white/5 p-3">
                   <CreditCard size={20} />
                 </div>
-                <div className="text-sm text-[var(--muted)]">Transfers</div>
+                <div className="text-sm text-[var(--muted)]">Transactions</div>
                 <div className="mt-2 text-3xl font-semibold tracking-[-0.05em]">
-                  124
+                  {transactions.length}
                 </div>
               </div>
 
@@ -302,85 +313,108 @@ export default function DashboardPage() {
                   <Shield size={20} />
                 </div>
                 <div className="text-sm text-[var(--muted)]">Membership</div>
-                <div className="mt-2 text-3xl font-semibold tracking-[-0.05em]">
-                  Active
-                </div>
+                <div className="mt-2 text-3xl font-semibold tracking-[-0.05em]">Active</div>
               </div>
             </div>
 
             <div className="card rounded-[32px] p-7">
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="text-sm text-[var(--muted)]">Product access</div>
+                  <div className="text-sm text-[var(--muted)]">Primary account</div>
                   <h2 className="mt-2 text-3xl font-semibold tracking-[-0.05em]">
-                    Reserve, Pay, Credit, Core
+                    {primaryAccount?.account_type ?? "Primary"} · {primaryAccount?.currency ?? "USD"}
                   </h2>
                 </div>
                 <ArrowUpRight />
               </div>
 
               <div className="mt-8 grid gap-4 md:grid-cols-2">
-                <div className="rounded-[22px] border border-white/10 bg-white/5 p-5 transition-all hover:bg-white/[0.08] hover:border-white/[0.15]">
-                  <div className="text-xs uppercase tracking-[0.1em] text-[var(--muted)]">Reserve</div>
-                  <div className="mt-3 text-xl font-semibold leading-tight">Treasury allocation</div>
+                <div className="rounded-[22px] border border-white/10 bg-white/5 p-5">
+                  <div className="text-sm text-[var(--muted)]">Status</div>
+                  <div className="mt-2 text-xl font-semibold">
+                    {primaryAccount?.status ?? "active"}
+                  </div>
                 </div>
                 <div className="rounded-[22px] border border-white/10 bg-white/5 p-5">
-                  <div className="text-sm text-[var(--muted)]">Pay</div>
-                  <div className="mt-2 text-xl font-semibold">Global transfers</div>
+                  <div className="text-sm text-[var(--muted)]">Accounts</div>
+                  <div className="mt-2 text-xl font-semibold">{accounts.length}</div>
                 </div>
                 <div className="rounded-[22px] border border-white/10 bg-white/5 p-5">
-                  <div className="text-sm text-[var(--muted)]">Credit</div>
-                  <div className="mt-2 text-xl font-semibold">Programmable access</div>
+                  <div className="text-sm text-[var(--muted)]">Balance</div>
+                  <div className="mt-2 text-xl font-semibold">
+                    $
+                    {Number(primaryAccount?.balance ?? 0).toLocaleString(undefined, {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                  </div>
                 </div>
                 <div className="rounded-[22px] border border-white/10 bg-white/5 p-5">
-                  <div className="text-sm text-[var(--muted)]">Core</div>
-                  <div className="mt-2 text-xl font-semibold">Infrastructure rails</div>
+                  <div className="text-sm text-[var(--muted)]">Yield</div>
+                  <div className="mt-2 text-xl font-semibold">
+                    $
+                    {Number(primaryAccount?.yield_earned ?? 0).toLocaleString(undefined, {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                  </div>
                 </div>
               </div>
             </div>
           </section>
 
           <aside className="grid gap-6">
-            <div className="account-card p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold">Recent Activity</h2>
-                <button className="text-sm text-[var(--accent)]">View All</button>
-              </div>
-              <div className="space-y-3">
-                {activity?.map((item) => (
-                  <a
-                    href="#"
-                    key={`${item.label}-${item.time}`}
-                    className={`activity-item block px-4 py-3 rounded-lg ${
-                      item.type === 'deposit' ? 'text-[var(--success)]' : ''
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="font-medium">{item.label}</div>
-                      <div className={`font-mono ${item.type === 'deposit' ? 'text-[var(--success)]' : ''}`}>
-                        {item.amount}
+            <div className="card rounded-[32px] p-7">
+              <div className="text-sm text-[var(--muted)]">Recent activity</div>
+              <div className="mt-5 space-y-4">
+                {transactions.length > 0 ? (
+                  transactions.map((item) => (
+                    <div
+                      key={item.id}
+                      className="rounded-[20px] border border-white/10 bg-white/5 p-4"
+                    >
+                      <div className="flex items-center justify-between gap-4">
+                        <div className="font-medium">
+                          {item.description || item.type || "Transaction"}
+                        </div>
+                        <div className="font-semibold">
+                          {item.amount != null
+                            ? `${Number(item.amount) >= 0 ? "+" : "-"}$${Math.abs(
+                                Number(item.amount)
+                              ).toLocaleString(undefined, {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              })}`
+                            : "--"}
+                        </div>
+                      </div>
+                      <div className="mt-2 text-sm text-[var(--muted)]">
+                        {item.created_at
+                          ? new Date(item.created_at).toLocaleString()
+                          : item.status || "posted"}
                       </div>
                     </div>
-                    <div className="mt-1 text-xs text-[var(--muted)]">
-                      {item.time}
-                    </div>
-                  </a>
-                ))}
+                  ))
+                ) : (
+                  <div className="rounded-[20px] border border-white/10 bg-white/5 p-4 text-sm text-[var(--muted)]">
+                    No transactions yet.
+                  </div>
+                )}
               </div>
             </div>
 
             <div className="card rounded-[32px] p-7">
               <div className="text-sm text-[var(--muted)]">Next steps</div>
               <ul className="mt-5 space-y-3 text-sm leading-6 text-[var(--muted)]">
-                <li>• Add auth and real accounts</li>
-                <li>• Add waitlist capture and onboarding</li>
-                <li>• Add wallet connection or email-first signup</li>
-                <li>• Add Noaerth portfolio linkback</li>
+                <li>• Add wallet connection or magic-link auth polish</li>
+                <li>• Add reserve allocation and transfer actions</li>
+                <li>• Add account settings and profile editing</li>
+                <li>• Add internal ledger and admin tooling</li>
               </ul>
             </div>
           </aside>
         </div>
-      </main>
-    </div>
+      </div>
+    </main>
   );
 }
