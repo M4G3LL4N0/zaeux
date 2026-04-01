@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { fonts } from "./fonts";
 import "./globals.css";
-import { Nav } from "@/components/Nav";
+import { Nav } from "@/components/nav";
 
 export const metadata: Metadata = {
   title: "Zaeux — Finance. Rebuilt. Owned by you.",

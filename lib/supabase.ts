@@ -16,10 +16,10 @@ export const supabase = createClient(
       flowType: "pkce",
       persistSession: true,
       autoRefreshToken: true,
-      detectSessionInUrl: true
+      detectSessionInUrl: true,
     },
     db: {
-      schema: "zaeux"
-    }
+      schema: "zaeux",
+    },
   }
 );

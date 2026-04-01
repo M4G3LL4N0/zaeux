@@ -84,7 +84,7 @@ export default function DashboardPage() {
           .upsert({
             id: user.id,
             email: user.email,
-            full_name: user.email?.split('@')[0] || null,
+            display_name: user.email?.split('@')[0] || null,
             updated_at: new Date().toISOString(),
           }, {
             onConflict: 'id'
