@@ -62,7 +62,8 @@ export default function HomePage() {
   return (
     <main className="min-h-screen">
 
-      <section className="relative overflow-hidden">
+      <section className="relative overflow-hidden border-b border-white/10">
+        <div className="absolute inset-0 bg-gradient-to-b from-black/50 to-black/0" />
         <div
           className="hero-glow left-[-120px] top-[80px]"
           style={{ background: "#7dd3fc" }}
@@ -72,14 +73,14 @@ export default function HomePage() {
           style={{ background: "#c4b5fd" }}
         />
 
-        <div className="container grid min-h-[88vh] items-center gap-12 py-18 md:grid-cols-[1.1fr_0.9fr]">
+        <div className="container grid min-h-[88vh] items-center gap-12 py-24 md:grid-cols-[1.1fr_0.9fr]">
           <div className="max-w-3xl">
-            <div className="badge">
+            <div className="badge bg-[var(--accent)]/10 border-[var(--accent)]/20 text-[var(--accent)]">
               <Sparkles size={14} />
               Onchain finance, reimagined
             </div>
 
-            <h1 className="mt-6 text-[clamp(54px,9vw,112px)] font-bold leading-[0.92] tracking-[-0.07em]">
+            <h1 className="mt-6 text-[clamp(54px,9vw,112px)] font-bold leading-[0.92] tracking-[-0.07em] bg-gradient-to-r from-[var(--accent)] to-[var(--accent-2)] bg-clip-text text-transparent">
               The financial system,
               <br />
               rebuilt for the future.

@@ -11,6 +11,18 @@ export function Nav() {
         </Link>
         <div className="flex items-center gap-4">
           <Link
+            href="/pay"
+            className="text-sm font-medium text-[var(--muted)] hover:text-white transition-colors px-3 py-2 rounded-lg hover:bg-white/5"
+          >
+            Pay
+          </Link>
+          <Link
+            href="/reserve"
+            className="text-sm font-medium text-[var(--muted)] hover:text-white transition-colors px-3 py-2 rounded-lg hover:bg-white/5"
+          >
+            Reserve
+          </Link>
+          <Link
             href="/dashboard"
             className="text-sm font-medium text-[var(--muted)] hover:text-white transition-colors px-3 py-2 rounded-lg hover:bg-white/5"
           >

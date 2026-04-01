@@ -88,6 +88,10 @@ a {
   line-height: 0.98;
   font-weight: 700;
   letter-spacing: -0.04em;
+  background: linear-gradient(to right, var(--accent), var(--accent-2));
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
 }
 
 .section-copy {
