@@ -9,12 +9,23 @@ export async function POST(request: Request) {
     const body = await request.json();
     
     // Validate required fields
-    if (!body.email?.trim() || !body.full_name?.trim()) {
+    if (!body.email?.trim()) {
       return NextResponse.json(
         { 
           success: false, 
-          error: "Please provide your full name and email address",
-          code: "MISSING_FIELDS"
+          error: "Please provide your email address",
+          code: "MISSING_EMAIL"
+        },
+        { status: 400 }
+      );
+    }
+    
+    if (!body.full_name?.trim()) {
+      return NextResponse.json(
+        { 
+          success: false, 
+          error: "Please provide your full name",
+          code: "MISSING_NAME"
         },
         { status: 400 }
       );
@@ -38,11 +49,9 @@ export async function POST(request: Request) {
       full_name: body.full_name.trim(),
       email: body.email.trim().toLowerCase(),
       company: body.company?.trim() || null,
-      interest: body.interest || null,
       source: "web",
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
-      metadata: body.metadata || null
     };
 
     // Insert into Supabase
@@ -59,7 +68,8 @@ export async function POST(request: Request) {
           success: false, 
           error: error.code === "23505" 
             ? "This email is already on the waitlist" 
-            : "Failed to join waitlist" 
+            : "Failed to join waitlist",
+          code: error.code || "INSERT_ERROR"
         },
         { status: 500 }
       );
@@ -77,7 +87,11 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error("Waitlist submission error:", error);
     return NextResponse.json(
-      { success: false, error: "An unexpected error occurred" },
+      { 
+        success: false, 
+        error: "An unexpected error occurred",
+        code: "UNKNOWN_ERROR"
+      },
       { status: 500 }
     );
   }
@@ -104,7 +118,11 @@ export async function GET() {
 
   } catch (error) {
     return NextResponse.json(
-      { success: false, error: "Failed to fetch waitlist" },
+      { 
+        success: false, 
+        error: "Failed to fetch waitlist",
+        code: "FETCH_ERROR"
+      },
       { status: 500 }
     );
   }

@@ -400,28 +400,28 @@ export default function HomePage() {
       </section>
 
       <section id="cta" className="container py-20">
-        <div className="card rounded-[36px] p-8 md:p-12">
-          <div className="max-w-3xl">
-            <div className="badge">Launch with Zaeux</div>
+        <div className="card rounded-[36px] p-8 md:p-12 bg-gradient-to-br from-black/50 to-black/30 border border-white/10">
+          <div className="max-w-3xl mx-auto">
+            <div className="badge bg-[var(--accent)]/10 border-[var(--accent)]/20 text-[var(--accent)]">
+              Early Access
+            </div>
             <h2 className="section-title mt-5">
-              Join the early wave before
+              Be among the first to experience
               <br />
-              the full platform goes live.
+              the future of finance
             </h2>
             <p className="section-copy mt-6 max-w-2xl">
-              Start with the brand, the product shell, and the story. Then expand
-              into real accounts, real treasury products, and real infrastructure.
+              Join our exclusive waitlist to gain early access to Zaeux's platform.
+              Experience seamless payments, smart treasury management, and innovative
+              financial products before anyone else.
             </p>
 
-            <WaitlistForm />
+            <div className="mt-8">
+              <WaitlistForm />
+            </div>
 
-            <div className="mt-8 flex flex-col gap-4 sm:flex-row">
-              <Link href="/dashboard" className="button-primary">
-                Open preview product
-              </Link>
-              <a href="mailto:hello@zaeux.com" className="button-secondary">
-                hello@zaeux.com
-              </a>
+            <div className="mt-8 text-center text-sm text-[var(--muted)]">
+              Limited spots available. Priority access for early signups.
             </div>
           </div>
         </div>
