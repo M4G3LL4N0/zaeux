@@ -62,15 +62,17 @@ export function WaitlistForm() {
 
   if (isSubmitted) {
     return (
-      <div className="rounded-2xl bg-[var(--success)]/10 p-6">
-        <div className="flex items-center gap-3">
-          <Check className="h-5 w-5 flex-shrink-0 text-[var(--success)]" />
+      <div className="rounded-[32px] bg-[var(--success)]/10 p-8">
+        <div className="flex items-center gap-4">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--success)]/20">
+            <Check className="h-5 w-5 text-[var(--success)]" />
+          </div>
           <div>
-            <h3 className="text-lg font-medium">
-              Thank you for joining the waitlist
+            <h3 className="text-xl font-semibold tracking-tight">
+              You're on the list
             </h3>
             <p className="mt-1 text-sm text-[var(--muted)]">
-              We'll be in touch soon with updates.
+              We'll send updates about your access and next steps soon.
             </p>
           </div>
         </div>
@@ -79,60 +81,72 @@ export function WaitlistForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="grid gap-4 md:grid-cols-2">
-        <input
-          type="text"
-          name="full_name"
-          value={formData.full_name}
-          onChange={(e) =>
-            setFormData({ ...formData, full_name: e.target.value })
-          }
-          placeholder="Full Name"
-          className="input-primary w-full"
-          required
-          minLength={2}
-        />
-        <input
-          type="email"
-          name="email"
-          value={formData.email}
-          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-          placeholder="Email Address"
-          className="input-primary w-full"
-          required
-        />
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="space-y-2">
+        <label className="text-sm font-medium text-[var(--muted)]">
+          Your details
+        </label>
+        <div className="grid gap-4 md:grid-cols-2">
+          <input
+            type="text"
+            name="full_name"
+            value={formData.full_name}
+            onChange={(e) =>
+              setFormData({ ...formData, full_name: e.target.value })
+            }
+            placeholder="Full Name"
+            className="input-primary w-full"
+            required
+            minLength={2}
+          />
+          <input
+            type="email"
+            name="email"
+            value={formData.email}
+            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+            placeholder="Work Email"
+            className="input-primary w-full"
+            required
+          />
+        </div>
       </div>
-      <div className="grid gap-4 sm:grid-cols-2">
-        <input
-          type="text"
-          name="company"
-          value={formData.company}
-          onChange={(e) => setFormData({ ...formData, company: e.target.value })}
-          placeholder="Company (optional)"
-          className="input-primary w-full"
-        />
-        <select
-          name="interest"
-          value={formData.interest}
-          onChange={(e) => setFormData({ ...formData, interest: e.target.value })}
-          className="input-primary w-full bg-black/50"
-        >
-          <option value="">Select your interest (optional)</option>
-          <option value="consumer">Consumer Products</option>
-          <option value="business">Business Solutions</option>
-          <option value="institutional">Institutional Services</option>
-        </select>
+
+      <div className="space-y-2">
+        <label className="text-sm font-medium text-[var(--muted)]">
+          Additional info
+        </label>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <input
+            type="text"
+            name="company"
+            value={formData.company}
+            onChange={(e) => setFormData({ ...formData, company: e.target.value })}
+            placeholder="Company"
+            className="input-primary w-full"
+          />
+          <select
+            name="interest"
+            value={formData.interest}
+            onChange={(e) => setFormData({ ...formData, interest: e.target.value })}
+            className="input-primary w-full bg-black/50"
+          >
+            <option value="">Primary Interest</option>
+            <option value="consumer">Consumer Products</option>
+            <option value="business">Business Solutions</option>
+            <option value="institutional">Institutional Services</option>
+          </select>
+        </div>
       </div>
+
       <button
         type="submit"
-        disabled={loading}
-        className="button-primary w-full"
+        disabled={isLoading}
+        className="button-primary w-full hover:bg-[var(--accent)]/90 transition-colors"
       >
-        {loading ? (
+        {isLoading ? (
           <Loader2 className="h-5 w-5 animate-spin" />
         ) : (
-          "Join Waitlist"
+          "Join Early Access"
         )}
       </button>
       {submitted && (

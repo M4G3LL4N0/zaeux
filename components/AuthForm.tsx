@@ -56,21 +56,26 @@ export function AuthForm() {
       <button
         type="submit"
         disabled={isLoading || success}
-        className="button-primary w-full"
+        className="button-primary w-full hover:bg-[var(--accent)]/90 transition-colors"
       >
         {isLoading ? (
           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
         ) : success ? (
-          "Check your email"
+          "Login Link Sent"
         ) : (
-          "Send login link"
+          "Continue with Email"
         )}
       </button>
 
       {error && (
-        <p className="text-center text-sm text-red-400">
+        <div className="rounded-xl bg-red-500/10 p-3 text-center text-sm text-red-300">
           {error}
-        </p>
+        </div>
+      )}
+      {success && (
+        <div className="rounded-xl bg-[var(--success)]/10 p-3 text-center text-sm text-[var(--success)]">
+          Check your email for the login link
+        </div>
       )}
     </form>
   );
