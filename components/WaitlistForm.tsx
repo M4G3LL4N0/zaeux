@@ -156,7 +156,7 @@ export function WaitlistForm() {
           "Join Early Access"
         )}
       </button>
-      {submitted && (
+      {isSubmitted && (
         <div className="mt-4 rounded-lg bg-[var(--success)]/10 p-4 text-center text-sm text-[var(--success)]">
           Thank you! We've received your information and will be in touch soon.
         </div>

@@ -238,11 +238,13 @@ export default function DashboardPage() {
           <h1 className="mt-2 text-5xl font-bold tracking-[-0.06em]">Dashboard Overview</h1>
         </div>
 
-        {error ? (
+        {error && (
           <div className="mb-6 card rounded-[24px] p-5">
-            <div className="text-sm text-red-300">{error}</div>
+            <div className="text-sm text-red-300">
+              Error: {error}. Please try again or contact support if the issue persists.
+            </div>
           </div>
-        ) : null}
+        )}
 
         <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr]">
           <section className="grid gap-6">

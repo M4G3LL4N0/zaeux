@@ -15,13 +15,13 @@ export default function LoginPage() {
         <AuthForm />
         <p className="mt-6 text-center text-sm text-[var(--muted)]">
           By continuing, you agree to our{" "}
-          <a href="#" className="hover:text-white transition-colors">
+          <Link href="/terms" className="hover:text-white transition-colors">
             Terms
-          </a>{" "}
+          </Link>{" "}
           and{" "}
-          <a href="#" className="hover:text-white transition-colors">
+          <Link href="/privacy" className="hover:text-white transition-colors">
             Privacy Policy
-          </a>
+          </Link>
         </p>
       </div>
   );

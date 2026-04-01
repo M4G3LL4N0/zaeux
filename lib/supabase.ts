@@ -15,7 +15,8 @@ export const supabase = createClient(
     auth: {
       flowType: "pkce",
       persistSession: true,
-      autoRefreshToken: true
+      autoRefreshToken: true,
+      detectSessionInUrl: true
     },
     db: {
       schema: "zaeux"

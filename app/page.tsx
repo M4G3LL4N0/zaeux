@@ -92,14 +92,19 @@ export default function HomePage() {
             </p>
 
             <div className="mt-8 flex flex-col gap-4 sm:flex-row">
-              <a href="#cta" className="button-primary hover:bg-[var(--accent)]/90 transition-colors">
+              <a 
+                href="#cta" 
+                className="button-primary hover:bg-[var(--accent)]/90 transition-colors"
+                aria-label="Join Early Access"
+              >
                 Join Early Access →
               </a>
               <Link 
                 href="/dashboard" 
                 className="button-secondary hover:bg-white/10 transition-colors"
+                aria-label="Explore Platform"
               >
-                Explore the Platform
+                Explore Platform
               </Link>
             </div>
 
