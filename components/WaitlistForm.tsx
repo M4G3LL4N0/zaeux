@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Loader2 } from "lucide-react";
+import { Loader2, Check } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export function WaitlistForm() {
   const [formData, setFormData] = useState({
@@ -10,45 +11,76 @@ export function WaitlistForm() {
     company: "",
     interest: "",
   });
-  const [loading, setLoading] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
   const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!formData.full_name || !formData.email) {
+      setError("Name and email are required");
+      return;
+    }
+
     setError("");
-    setLoading(true);
+    setIsLoading(true);
 
     try {
       const response = await fetch("/api/waitlist", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        headers: { 
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          full_name: formData.full_name.trim(),
+          email: formData.email.trim(),
+          company: formData.company.trim(),
+          interest: formData.interest
+        }),
       });
 
       if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || "Failed to submit form");
+        throw new Error(
+          response.status === 400 
+            ? "Invalid input - please check your details"
+            : "Failed to join waitlist"
+        );
       }
 
-      setSubmitted(true);
-      setFormData({
-        full_name: "",
-        email: "",
-        company: "",
-        interest: "",
-      });
-    } catch (error) {
-      setError(error instanceof Error ? error.message : "Submission failed");
-      console.error("Error submitting form:", error);
+      setIsSubmitted(true);
+    } catch (err) {
+      setError(
+        err instanceof Error 
+          ? err.message 
+          : "Couldn't submit form. Please try again."
+      );
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
+  if (isSubmitted) {
+    return (
+      <div className="rounded-2xl bg-[var(--success)]/10 p-6">
+        <div className="flex items-center gap-3">
+          <Check className="h-5 w-5 flex-shrink-0 text-[var(--success)]" />
+          <div>
+            <h3 className="text-lg font-medium">
+              Thank you for joining the waitlist
+            </h3>
+            <p className="mt-1 text-sm text-[var(--muted)]">
+              We'll be in touch soon with updates.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <form onSubmit={handleSubmit} className="mt-8 space-y-4">
-      <div className="grid gap-4 sm:grid-cols-2">
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="grid gap-4 md:grid-cols-2">
         <input
           type="text"
           name="full_name"

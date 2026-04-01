@@ -78,29 +78,16 @@ export default function DashboardPage() {
         setIsAuthed(true);
         setEmail(user.email ?? "");
 
-        const { data: existingProfile, error: profileError } = await supabase
-          .from("profiles")
-          .select("id")
-          .eq("id", user.id)
-          .maybeSingle();
+        // Ensure profile exists
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .upsert({
+            id: user.id,
+            email: user.email,
+            updated_at: new Date().toISOString(),
+          });
 
-        if (profileError) {
-          throw profileError;
-        }
-
-        if (!existingProfile) {
-          const { error: insertProfileError } = await supabase.from("profiles").insert([
-            {
-              id: user.id,
-              email: user.email ?? null,
-              display_name: user.user_metadata?.display_name ?? null,
-            },
-          ]);
-
-          if (insertProfileError) {
-            throw insertProfileError;
-          }
-        }
+        if (profileError) throw profileError;
 
         const { data: accountRows, error: accountsError } = await supabase
           .from("accounts")
