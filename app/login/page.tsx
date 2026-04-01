@@ -1,6 +1,4 @@
 import { AuthForm } from "@/components/AuthForm";
-import { supabase } from "@/lib/supabase";
-import { redirect } from "next/navigation";
 
 export default function LoginPage() {
   return (
