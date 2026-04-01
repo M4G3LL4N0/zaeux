@@ -1,161 +1,45 @@
-export type Json =
+export type Json = 
   | string
   | number
   | boolean
   | null
-  | { [key: string]: Json | undefined }
+  | { [key: string]: Json }
   | Json[];
 
-export type WaitlistEntry = {
-  full_name?: string | null;
-  email: string;
-  company?: string | null;
-  interest?: string | null;
-  source?: string | null;
-  metadata?: Record<string, unknown>;
-};
+export interface Profile {
+  id: string;
+  email: string | null;
+  display_name: string | null;
+  updated_at: string;
+}
 
-export type Database = {
-  zaeux: {
-    Tables: {
-      waitlist: {
-        Row: {
-          id: string;
-          full_name: string | null;
-          email: string;
-          company: string | null;
-          interest: string | null;
-          source: string | null;
-          metadata: Json;
-          created_at: string;
-        };
-        Insert: {
-          id?: string;
-          full_name?: string | null;
-          email: string;
-          company?: string | null;
-          interest?: string | null;
-          source?: string | null;
-          metadata?: Json;
-          created_at?: string;
-        };
-        Update: {
-          id?: string;
-          full_name?: string | null;
-          email?: string;
-          company?: string | null;
-          interest?: string | null;
-          source?: string | null;
-          metadata?: Json;
-          created_at?: string;
-        };
-      };
-      profiles: {
-        Row: {
-          id: string;
-          email: string | null;
-          display_name: string | null;
-          avatar_url: string | null;
-          role: string;
-          created_at: string;
-          updated_at: string;
-        };
-        Insert: {
-          id: string;
-          email?: string | null;
-          display_name?: string | null;
-          avatar_url?: string | null;
-          role?: string;
-          created_at?: string;
-          updated_at?: string;
-        };
-        Update: {
-          id?: string;
-          email?: string | null;
-          display_name?: string | null;
-          avatar_url?: string | null;
-          role?: string;
-          created_at?: string;
-          updated_at?: string;
-        };
-      };
-      accounts: {
-        Row: {
-          id: string;
-          user_id: string;
-          account_type: string | null;
-          currency: string | null;
-          balance: string | number | null;
-          yield_earned: string | number | null;
-          status: string | null;
-          created_at: string | null;
-          updated_at: string | null;
-        };
-        Insert: {
-          id?: string;
-          user_id: string;
-          account_type?: string | null;
-          currency?: string | null;
-          balance?: string | number | null;
-          yield_earned?: string | number | null;
-          status?: string | null;
-          created_at?: string | null;
-          updated_at?: string | null;
-        };
-        Update: {
-          id?: string;
-          user_id?: string;
-          account_type?: string | null;
-          currency?: string | null;
-          balance?: string | number | null;
-          yield_earned?: string | number | null;
-          status?: string | null;
-          created_at?: string | null;
-          updated_at?: string | null;
-        };
-      };
-      transactions: {
-        Row: {
-          id: string;
-          user_id: string;
-          account_id: string | null;
-          amount: string | number;
-          currency: string | null;
-          type: string;
-          status: string | null;
-          description: string | null;
-          metadata: Json | null;
-          created_at: string | null;
-        };
-        Insert: {
-          id?: string;
-          user_id: string;
-          account_id?: string | null;
-          amount: string | number;
-          currency?: string | null;
-          type: string;
-          status?: string | null;
-          description?: string | null;
-          metadata?: Json | null;
-          created_at?: string | null;
-        };
-        Update: {
-          id?: string;
-          user_id?: string;
-          account_id?: string | null;
-          amount?: string | number;
-          currency?: string | null;
-          type?: string;
-          status?: string | null;
-          description?: string | null;
-          metadata?: Json | null;
-          created_at?: string | null;
-        };
-      };
-    };
-    Views: {};
-    Functions: {};
-    Enums: {};
-    CompositeTypes: {};
-  };
-};
+export interface Account {
+  id: string;
+  user_id: string;
+  account_type: string;
+  currency: string;
+  balance: number;
+  yield_earned: number;
+  status: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Transaction {
+  id: string;
+  user_id: string;
+  account_id: string;
+  amount: number;
+  currency: string;
+  type: 'credit' | 'debit';
+  description: string | null;
+  created_at: string;
+}
+
+export interface WaitlistEntry {
+  id: string;
+  email: string;
+  full_name: string | null;
+  company: string | null;
+  created_at: string;
+}

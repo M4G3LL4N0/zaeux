@@ -11,74 +11,48 @@ import {
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
-type AccountRow = {
+type Account = {
   id: string;
-  user_id: string;
-  account_type: string;
-  currency: string;
   balance: number;
   yield_earned: number;
+  currency: string;
   status: string;
-  created_at: string;
-  updated_at: string;
 };
 
-type TransactionRow = {
+type Transaction = {
   id: string;
-  user_id: string;
-  account_id: string;
   amount: number;
   currency: string;
   type: 'credit' | 'debit';
-  status: string;
   description: string | null;
-  metadata: Record<string, unknown> | null;
   created_at: string;
 };
 
 export default function DashboardPage() {
   const router = useRouter();
-
   const [loading, setLoading] = useState(true);
-  const [isAuthed, setIsAuthed] = useState(false);
-  const [email, setEmail] = useState<string>("");
-  const [accounts, setAccounts] = useState<AccountRow[]>([]);
-  const [transactions, setTransactions] = useState<TransactionRow[]>([]);
-  const [error, setError] = useState<string>("");
+  const [email, setEmail] = useState("");
+  const [accounts, setAccounts] = useState<Account[]>([]);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    let isMounted = true;
-
-    async function loadDashboard() {
+    const fetchData = async () => {
       try {
         setLoading(true);
         setError("");
 
-        const {
-          data: { user },
-          error: userError,
-        } = await supabase.auth.getUser();
-
-        if (userError) {
-          throw userError;
-        }
-
-        if (!user) {
-          if (isMounted) {
-            setIsAuthed(false);
-            setAccounts([]);
-            setTransactions([]);
-            setEmail("");
-          }
+        // Get authenticated user
+        const { data: { user }, error: authError } = await supabase.auth.getUser();
+        if (authError || !user) {
+          router.push("/login");
           return;
         }
 
-        if (!isMounted) return;
+        // Set user email
+        setEmail(user.email || "");
 
-        setIsAuthed(true);
-        setEmail(user.email ?? "");
-
-        // Ensure profile exists with correct schema
+        // Ensure profile exists
         const { error: profileError } = await supabase
           .from('profiles')
           .upsert({
@@ -86,81 +60,63 @@ export default function DashboardPage() {
             email: user.email,
             display_name: user.email?.split('@')[0] || null,
             updated_at: new Date().toISOString(),
-          }, {
-            onConflict: 'id'
-          });
+          }, { onConflict: 'id' });
 
         if (profileError) throw profileError;
 
-        const { data: accountRows, error: accountsError } = await supabase
-          .from("accounts")
-          .select("*")
-          .eq("user_id", user.id)
-          .order("created_at", { ascending: false })
-          .limit(1); // Only get primary account for now
+        // Get or create primary account
+        const { data: accountsData, error: accountsError } = await supabase
+          .from('accounts')
+          .select('id, balance, yield_earned, currency, status')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(1);
 
-        if (accountsError) {
-          throw accountsError;
+        if (accountsError) throw accountsError;
+
+        let primaryAccount = accountsData?.[0];
+        if (!primaryAccount) {
+          const { data: newAccount, error: createError } = await supabase
+            .from('accounts')
+            .insert({
+              user_id: user.id,
+              account_type: 'primary',
+              currency: 'USD',
+              balance: 0,
+              yield_earned: 0,
+              status: 'active',
+            })
+            .select('id, balance, yield_earned, currency, status')
+            .single();
+
+          if (createError) throw createError;
+          primaryAccount = newAccount;
         }
 
-        let resolvedAccounts = accountRows ?? [];
-
-        if (resolvedAccounts.length === 0) {
-          const { data: insertedAccounts, error: createAccountError } = await supabase
-            .from("accounts")
-            .insert([
-              {
-                user_id: user.id,
-                account_type: "primary",
-                currency: "USD",
-                balance: 0,
-                yield_earned: 0,
-                status: "active",
-              },
-            ])
-            .select("*");
-
-          if (createAccountError) {
-            throw createAccountError;
-          }
-
-          resolvedAccounts = insertedAccounts ?? [];
-        }
-
-        const { data: transactionRows, error: transactionsError } = await supabase
-          .from("transactions")
-          .select("id, user_id, account_id, amount, currency, type, status, description, created_at")
-          .eq("user_id", user.id)
-          .order("created_at", { ascending: false })
+        // Get recent transactions
+        const { data: transactionsData, error: transactionsError } = await supabase
+          .from('transactions')
+          .select('id, amount, currency, type, description, created_at')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
           .limit(8);
 
-        if (transactionsError) {
-          throw transactionsError;
-        }
+        if (transactionsError) throw transactionsError;
 
-        if (!isMounted) return;
-
-        setAccounts(resolvedAccounts);
-        setTransactions(transactionRows ?? []);
+        // Update state
+        setAccounts(primaryAccount ? [primaryAccount] : []);
+        setTransactions(transactionsData || []);
       } catch (err) {
-        if (!isMounted) return;
-        const message = err instanceof Error ? err.message : "Failed to load dashboard";
-        console.error("Dashboard error:", message);
-        setError(message);
+        setError(err instanceof Error ? err.message : "Failed to load dashboard");
+        console.error("Dashboard error:", err);
         router.push("/login");
       } finally {
-        if (isMounted) {
-          setLoading(false);
-        }
+        setLoading(false);
       }
-    }
-
-    loadDashboard();
-
-    return () => {
-      isMounted = false;
     };
-  }, []);
+
+    fetchData();
+  }, [router]);
 
   const primaryAccount = accounts[0];
 
