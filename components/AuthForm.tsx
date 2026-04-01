@@ -20,9 +20,10 @@ export function AuthForm() {
 
     try {
       const { error: authError } = await supabase.auth.signInWithOtp({
-        email,
+        email: email.trim(),
         options: {
-          emailRedirectTo: `${window.location.origin}/dashboard`,
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
+          shouldCreateUser: false // Only allow existing users
         },
       });
 

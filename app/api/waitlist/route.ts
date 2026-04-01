@@ -8,18 +8,35 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
     
-    // Basic validation
-    if (!body.email || !body.full_name) {
+    // Validate required fields
+    if (!body.email?.trim() || !body.full_name?.trim()) {
       return NextResponse.json(
-        { success: false, error: "Email and full name are required" },
+        { 
+          success: false, 
+          error: "Please provide your full name and email address",
+          code: "MISSING_FIELDS"
+        },
         { status: 400 }
       );
     }
 
-    // Prepare clean data
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(body.email.trim())) {
+      return NextResponse.json(
+        { 
+          success: false, 
+          error: "Please enter a valid email address",
+          code: "INVALID_EMAIL"
+        },
+        { status: 400 }
+      );
+    }
+
+    // Prepare clean data with explicit types
     const waitlistData: WaitlistEntry = {
-      full_name: body.full_name?.trim() || null,
-      email: body.email.trim(),
+      full_name: body.full_name.trim(),
+      email: body.email.trim().toLowerCase(),
       company: body.company?.trim() || null,
       interest: body.interest || null,
       source: "web",

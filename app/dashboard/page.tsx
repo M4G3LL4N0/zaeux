@@ -78,22 +78,26 @@ export default function DashboardPage() {
         setIsAuthed(true);
         setEmail(user.email ?? "");
 
-        // Ensure profile exists
+        // Ensure profile exists with correct schema
         const { error: profileError } = await supabase
           .from('profiles')
           .upsert({
             id: user.id,
             email: user.email,
+            full_name: user.email?.split('@')[0] || null,
             updated_at: new Date().toISOString(),
+          }, {
+            onConflict: 'id'
           });
 
         if (profileError) throw profileError;
 
         const { data: accountRows, error: accountsError } = await supabase
           .from("accounts")
-          .select("id, user_id, account_type, currency, balance, yield_earned, status, created_at, updated_at")
+          .select("*")
           .eq("user_id", user.id)
-          .order("created_at", { ascending: false });
+          .order("created_at", { ascending: false })
+          .limit(1); // Only get primary account for now
 
         if (accountsError) {
           throw accountsError;

@@ -29,16 +29,23 @@ export function WaitlistForm() {
     try {
       const response = await fetch("/api/waitlist", {
         method: "POST",
-        headers: { 
-          "Content-Type": "application/json"
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           full_name: formData.full_name.trim(),
           email: formData.email.trim(),
           company: formData.company.trim(),
-          interest: formData.interest
+          interest: formData.interest,
+          metadata: {
+            source: "web",
+            timestamp: new Date().toISOString()
+          }
         }),
       });
+
+      const result = await response.json();
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || "Failed to join waitlist");
+      }
 
       if (!response.ok) {
         throw new Error(
