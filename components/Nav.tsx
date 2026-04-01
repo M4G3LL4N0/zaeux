@@ -12,15 +12,15 @@ export function Nav() {
         <div className="flex items-center gap-4">
           <Link
             href="/dashboard"
-            className="button-secondary text-sm hover:bg-white/10 transition-colors"
+            className="text-sm font-medium text-[var(--muted)] hover:text-white transition-colors px-3 py-2 rounded-lg hover:bg-white/5"
           >
-            Product Preview
+            Platform
           </Link>
           <Link
             href="#cta"
-            className="button-primary text-sm hover:bg-[var(--accent)]/90 transition-colors"
+            className="button-primary text-sm hover:bg-[var(--accent)]/90 transition-colors px-4 py-2"
           >
-            Get Early Access
+            Join Early Access →
           </Link>
         </div>
       </div>

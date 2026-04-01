@@ -84,7 +84,7 @@ export function WaitlistForm() {
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="space-y-2">
         <label className="text-sm font-medium text-[var(--muted)]">
-          Your details
+          Join the Future of Finance
         </label>
         <div className="grid gap-4 md:grid-cols-2">
           <input
@@ -113,7 +113,7 @@ export function WaitlistForm() {
 
       <div className="space-y-2">
         <label className="text-sm font-medium text-[var(--muted)]">
-          Additional info
+          Help Us Build for You
         </label>
         <div className="grid gap-4 sm:grid-cols-2">
           <input

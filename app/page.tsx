@@ -80,25 +80,25 @@ export default function HomePage() {
             </div>
 
             <h1 className="mt-6 text-[clamp(54px,9vw,112px)] font-bold leading-[0.92] tracking-[-0.07em]">
-              Finance.
+              The financial system,
               <br />
-              Rebuilt.
-              <br />
-              Owned by you.
+              rebuilt for the future.
             </h1>
 
-            <p className="mt-6 max-w-2xl text-lg leading-8 text-[var(--muted)] md:text-xl">
-              Zaeux is the modern financial layer for people, businesses, and
-              institutions who want a cleaner system for payments, treasury,
-              access, and growth.
+            <p className="mt-6 max-w-2xl text-xl leading-8 text-[var(--muted)]">
+              Zaeux combines institutional-grade infrastructure with consumer-friendly design - 
+              a unified platform for payments, treasury, and financial growth.
             </p>
 
             <div className="mt-8 flex flex-col gap-4 sm:flex-row">
-              <a href="#cta" className="button-primary">
-                Get early access
+              <a href="#cta" className="button-primary hover:bg-[var(--accent)]/90 transition-colors">
+                Join Early Access →
               </a>
-              <Link href="/dashboard" className="button-secondary">
-                See the product shell
+              <Link 
+                href="/dashboard" 
+                className="button-secondary hover:bg-white/10 transition-colors"
+              >
+                Explore the Platform
               </Link>
             </div>
 

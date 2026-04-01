@@ -229,9 +229,9 @@ export default function DashboardPage() {
           <div className="container px-6 py-8">
         <div className="mb-8">
           <div className="text-sm uppercase tracking-[0.2em] text-[var(--muted)]">
-            Zaeux dashboard
+            Your Financial Control Center
           </div>
-          <h1 className="mt-2 text-5xl font-bold tracking-[-0.06em]">Overview</h1>
+          <h1 className="mt-2 text-5xl font-bold tracking-[-0.06em]">Dashboard Overview</h1>
         </div>
 
         {error ? (
@@ -245,7 +245,7 @@ export default function DashboardPage() {
             <div className="card rounded-2xl p-6">
               <div className="flex items-start justify-between">
                 <div>
-                  <div className="text-sm text-[var(--muted)]">Total balance</div>
+                  <div className="text-sm text-[var(--muted)]">Your Total Balance</div>
                   <div className="mt-2 text-6xl font-bold tracking-[-0.07em]">
                     $
                     {totalBalance.toLocaleString(undefined, {
