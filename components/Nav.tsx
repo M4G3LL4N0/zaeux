@@ -9,28 +9,28 @@ export function Nav() {
             Zaeux
           </span>
         </Link>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2">
           <Link
             href="/pay"
-            className="text-sm font-medium text-[var(--muted)] hover:text-white transition-colors px-3 py-2 rounded-lg hover:bg-white/5"
+            className="nav-link"
           >
             Pay
           </Link>
           <Link
             href="/reserve"
-            className="text-sm font-medium text-[var(--muted)] hover:text-white transition-colors px-3 py-2 rounded-lg hover:bg-white/5"
+            className="nav-link"
           >
             Reserve
           </Link>
           <Link
             href="/dashboard"
-            className="text-sm font-medium text-[var(--muted)] hover:text-white transition-colors px-3 py-2 rounded-lg hover:bg-white/5"
+            className="nav-link"
           >
             Platform
           </Link>
           <Link
             href="#cta"
-            className="button-primary text-sm hover:bg-[var(--accent)]/90 transition-colors px-4 py-2"
+            className="nav-cta"
           >
             Join Early Access →
           </Link>

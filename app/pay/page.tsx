@@ -3,21 +3,22 @@ import { CreditCard, Globe, Zap } from "lucide-react";
 export default function PayPage() {
   return (
     <main className="min-h-screen">
-      <div className="container py-24">
-        <div className="max-w-3xl">
-          <div className="badge">Zaeux Pay</div>
-          <h1 className="section-title mt-5">
-            Global payments,
-            <br />
-            simplified.
-          </h1>
-          <p className="section-copy mt-6 max-w-2xl">
-            Move money instantly across borders with stable digital rails and a 
-            cleaner payments interface.
-          </p>
-        </div>
+      <div className="section-padding">
+        <div className="container">
+          <div className="max-w-3xl">
+            <div className="badge">Zaeux Pay</div>
+            <h1 className="section-title">
+              Global payments,
+              <br />
+              simplified.
+            </h1>
+            <p className="section-copy">
+              Move money instantly across borders with stable digital rails and a 
+              cleaner payments interface.
+            </p>
+          </div>
 
-        <div className="mt-10 grid gap-6 md:grid-cols-3">
+          <div className="section-grid md:grid-cols-3">
           <div className="card">
             <div className="mb-5 inline-flex rounded-2xl border border-white/10 bg-white/5 p-3">
               <Zap size={22} />

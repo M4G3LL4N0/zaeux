@@ -62,7 +62,7 @@ export default function HomePage() {
   return (
     <main className="min-h-screen">
 
-      <section className="relative overflow-hidden border-b border-white/10">
+      <section className="section-padding relative overflow-hidden border-b border-white/10">
         <div className="absolute inset-0 bg-gradient-to-b from-black/50 to-black/0" />
         <div
           className="hero-glow left-[-120px] top-[80px]"
@@ -73,7 +73,7 @@ export default function HomePage() {
           style={{ background: "#c4b5fd" }}
         />
 
-        <div className="container grid min-h-[88vh] items-center gap-12 py-24 md:grid-cols-[1.1fr_0.9fr]">
+        <div className="container grid min-h-[88vh] items-center gap-12 md:grid-cols-[1.1fr_0.9fr]">
           <div className="max-w-3xl">
             <div className="badge bg-[var(--accent)]/10 border-[var(--accent)]/20 text-[var(--accent)]">
               <Sparkles size={14} />
@@ -166,23 +166,24 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section id="moment" className="container py-20">
-        <div className="max-w-3xl">
-          <div className="badge">Market moment</div>
-          <h2 className="section-title mt-5">
-            The financial system is ready
-            <br />
-            for its next evolution.
-          </h2>
-          <p className="section-copy mt-6 max-w-2xl">
-            Traditional finance struggles with legacy infrastructure while crypto
-            remains fragmented and inaccessible. Zaeux bridges this gap with a
-            unified platform that combines institutional-grade infrastructure
-            with consumer-friendly design.
-          </p>
-        </div>
+      <section id="moment" className="section-padding">
+        <div className="container">
+          <div className="max-w-3xl">
+            <div className="badge">Market moment</div>
+            <h2 className="section-title">
+              The financial system is ready
+              <br />
+              for its next evolution.
+            </h2>
+            <p className="section-copy">
+              Traditional finance struggles with legacy infrastructure while crypto
+              remains fragmented and inaccessible. Zaeux bridges this gap with a
+              unified platform that combines institutional-grade infrastructure
+              with consumer-friendly design.
+            </p>
+          </div>
 
-        <div className="mt-10 grid gap-6 md:grid-cols-3">
+          <div className="section-grid md:grid-cols-3">
           <div className="card">
             <h3 className="text-2xl font-semibold tracking-[-0.04em]">
               Infrastructure gap
