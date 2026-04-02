@@ -9,9 +9,30 @@ import {
   Shield,
   Wallet,
 } from "lucide-react";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/src/lib/supabase";
 
-import type { Profile, Account, Transaction } from "@/lib/supabase";
+type AccountRow = {
+  id: string;
+  user_id: string;
+  account_type?: string | null;
+  currency?: string | null;
+  balance?: string | number | null;
+  yield_earned?: string | number | null;
+  status?: string | null;
+  created_at?: string | null;
+};
+
+type TransactionRow = {
+  id: string;
+  user_id: string;
+  account_id?: string | null;
+  amount?: string | number | null;
+  currency?: string | null;
+  type?: string | null;
+  status?: string | null;
+  description?: string | null;
+  created_at?: string | null;
+};
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -24,26 +45,56 @@ export default function DashboardPage() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    let isMounted = true;
+    let cancelled = false;
 
     async function loadDashboard() {
       try {
         setLoading(true);
         setError("");
 
-        const user = await getUser();
-        
+        const {
+          data: { user },
+          error: userError,
+        } = await supabase.auth.getUser();
+
+        if (userError) throw userError;
+
         if (!user) {
-          setIsAuthed(false);
+          if (!cancelled) {
+            setIsAuthed(false);
+            setEmail("");
+            setAccounts([]);
+            setTransactions([]);
+          }
           return;
         }
 
-        setIsAuthed(true);
-        setEmail(user.email ?? "");
+        if (!cancelled) {
+          setIsAuthed(true);
+          setEmail(user.email ?? "");
+        }
 
-        await ensureProfile(user.id, user.email ?? "");
+        const { data: existingProfile, error: profileError } = await supabase
+          .from("profiles")
+          .select("id")
+          .eq("id", user.id)
+          .maybeSingle();
 
-        const { data: accounts, error: accountsError } = await supabase
+        if (profileError) throw profileError;
+
+        if (!existingProfile) {
+          const { error: insertProfileError } = await supabase.from("profiles").insert([
+            {
+              id: user.id,
+              email: user.email ?? null,
+              display_name: user.user_metadata?.display_name ?? null,
+            },
+          ]);
+
+          if (insertProfileError) throw insertProfileError;
+        }
+
+        const { data: accountRows, error: accountsError } = await supabase
           .from("accounts")
           .select("*")
           .eq("user_id", user.id)
@@ -51,26 +102,28 @@ export default function DashboardPage() {
 
         if (accountsError) throw accountsError;
 
-        let resolvedAccounts = accounts ?? [];
+        let resolvedAccounts = (accountRows ?? []) as AccountRow[];
 
         if (resolvedAccounts.length === 0) {
-          const { data: newAccounts, error: createError } = await supabase
+          const { data: insertedAccounts, error: createAccountError } = await supabase
             .from("accounts")
-            .insert([{
-              user_id: user.id,
-              account_type: "primary",
-              currency: "USD",
-              balance: 0,
-              yield_earned: 0,
-              status: "active"
-            }])
+            .insert([
+              {
+                user_id: user.id,
+                account_type: "primary",
+                currency: "USD",
+                balance: 0,
+                yield_earned: 0,
+                status: "active",
+              },
+            ])
             .select("*");
 
-          if (createError) throw createError;
-          resolvedAccounts = newAccounts ?? [];
+          if (createAccountError) throw createAccountError;
+          resolvedAccounts = (insertedAccounts ?? []) as AccountRow[];
         }
 
-        const { data: transactions, error: transactionsError } = await supabase
+        const { data: transactionRows, error: transactionsError } = await supabase
           .from("transactions")
           .select("*")
           .eq("user_id", user.id)
@@ -79,21 +132,26 @@ export default function DashboardPage() {
 
         if (transactionsError) throw transactionsError;
 
-        if (isMounted) {
+        if (!cancelled) {
           setAccounts(resolvedAccounts);
-          setTransactions(transactions ?? []);
+          setTransactions((transactionRows ?? []) as TransactionRow[]);
         }
       } catch (err) {
-        if (isMounted) {
-          setError(err instanceof Error ? err.message : "Failed to load dashboard");
+        if (!cancelled) {
+          setError(err instanceof Error ? err.message : "Failed to load dashboard.");
         }
       } finally {
-        if (isMounted) setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
     }
 
     loadDashboard();
-    return () => { isMounted = false };
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const primaryAccount = accounts[0];
@@ -142,8 +200,8 @@ export default function DashboardPage() {
               Sign in to access your dashboard
             </h1>
             <p className="mt-5 max-w-2xl text-base leading-7 text-[var(--muted)]">
-              Your live account, balances, and transaction activity appear here
-              once you log in.
+              Your live account, balances, and transaction activity appear here once
+              you log in.
             </p>
             <div className="mt-8 flex flex-wrap gap-4">
               <button className="button-primary" onClick={() => router.push("/login")}>
@@ -187,10 +245,7 @@ export default function DashboardPage() {
           </div>
         ) : null}
 
-        <div className="grid gap-6 lg:grid-cols-[1fr_0.8fr]">
-          <DashboardSidebar />
-          
-          <div className="space-y-6">
+        <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
           <section className="grid gap-6">
             <div className="card rounded-[32px] p-7">
               <div className="flex items-start justify-between">
@@ -272,10 +327,12 @@ export default function DashboardPage() {
                     {primaryAccount?.status ?? "active"}
                   </div>
                 </div>
+
                 <div className="rounded-[22px] border border-white/10 bg-white/5 p-5">
                   <div className="text-sm text-[var(--muted)]">Accounts</div>
                   <div className="mt-2 text-xl font-semibold">{accounts.length}</div>
                 </div>
+
                 <div className="rounded-[22px] border border-white/10 bg-white/5 p-5">
                   <div className="text-sm text-[var(--muted)]">Balance</div>
                   <div className="mt-2 text-xl font-semibold">
@@ -286,6 +343,7 @@ export default function DashboardPage() {
                     })}
                   </div>
                 </div>
+
                 <div className="rounded-[22px] border border-white/10 bg-white/5 p-5">
                   <div className="text-sm text-[var(--muted)]">Yield</div>
                   <div className="mt-2 text-xl font-semibold">
