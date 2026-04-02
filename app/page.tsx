@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { WaitlistForm } from "@/components/WaitlistForm";
 import {
   ArrowRight,
   Building2,
@@ -11,6 +10,7 @@ import {
   Sparkles,
   Wallet,
 } from "lucide-react";
+import { WaitlistForm } from "@/components/WaitlistForm";
 
 const pillars = [
   {
@@ -36,19 +36,54 @@ const pillars = [
 const products = [
   {
     title: "Zaeux Pay",
-    copy: "Move money globally with stable digital rails and a cleaner payments interface.",
+    copy:
+      "Move money globally with stable digital rails and a cleaner payments interface.",
+    href: "/pay",
   },
   {
     title: "Zaeux Reserve",
-    copy: "Treasury-style balance management for users and businesses that want more than idle cash.",
+    copy:
+      "Treasury-style balance management for users and businesses that want more than idle cash.",
+    href: "/reserve",
   },
   {
     title: "Zaeux Credit",
-    copy: "The future lending layer for member access, capital pools, and programmable credit products.",
+    copy:
+      "The future lending layer for member access, capital pools, and programmable credit products.",
+    href: "/credit",
   },
   {
     title: "Zaeux Core",
-    copy: "Infrastructure APIs and ledger systems for fintechs, operators, and financial institutions.",
+    copy:
+      "Infrastructure APIs and ledger systems for fintechs, operators, and financial institutions.",
+    href: "/core",
+  },
+];
+
+const audience = [
+  {
+    icon: CreditCard,
+    title: "Consumers",
+    copy:
+      "A cleaner financial home for balances, movement, and long-term account logic.",
+  },
+  {
+    icon: Building2,
+    title: "Businesses",
+    copy:
+      "Treasury, settlement, and financial operations built for modern internet-native companies.",
+  },
+  {
+    icon: Landmark,
+    title: "Institutions",
+    copy:
+      "A future-facing infrastructure layer for partners that need serious rails and structured access.",
+  },
+  {
+    icon: Globe,
+    title: "Global operators",
+    copy:
+      "Borderless money movement, digital account logic, and programmable access across markets.",
   },
 ];
 
@@ -61,9 +96,7 @@ const stats = [
 export default function HomePage() {
   return (
     <main className="min-h-screen">
-
-      <section className="section-padding relative overflow-hidden border-b border-white/10">
-        <div className="absolute inset-0 bg-gradient-to-b from-black/50 to-black/0" />
+      <section className="relative overflow-hidden">
         <div
           className="hero-glow left-[-120px] top-[80px]"
           style={{ background: "#7dd3fc" }}
@@ -73,38 +106,33 @@ export default function HomePage() {
           style={{ background: "#c4b5fd" }}
         />
 
-        <div className="container grid min-h-[88vh] items-center gap-12 md:grid-cols-[1.1fr_0.9fr]">
+        <div className="container grid min-h-[88vh] items-center gap-12 py-18 md:grid-cols-[1.1fr_0.9fr]">
           <div className="max-w-3xl">
-            <div className="badge bg-[var(--accent)]/10 border-[var(--accent)]/20 text-[var(--accent)]">
+            <div className="badge">
               <Sparkles size={14} />
               Onchain finance, reimagined
             </div>
 
-            <h1 className="mt-6 text-[clamp(54px,9vw,112px)] font-bold leading-[0.92] tracking-[-0.07em] bg-gradient-to-r from-[var(--accent)] to-[var(--accent-2)] bg-clip-text text-transparent">
-              The financial system,
+            <h1 className="mt-6 text-[clamp(54px,9vw,112px)] font-bold leading-[0.92] tracking-[-0.07em]">
+              Finance.
               <br />
-              rebuilt for the future.
+              Rebuilt.
+              <br />
+              Owned by you.
             </h1>
 
-            <p className="mt-6 max-w-2xl text-xl leading-8 text-[var(--muted)]">
-              Zaeux combines institutional-grade infrastructure with consumer-friendly design - 
-              a unified platform for payments, treasury, and financial growth.
+            <p className="mt-6 max-w-2xl text-lg leading-8 text-[var(--muted)] md:text-xl">
+              Zaeux is the modern financial layer for people, businesses, and
+              institutions who want a cleaner system for payments, treasury,
+              access, and growth.
             </p>
 
             <div className="mt-8 flex flex-col gap-4 sm:flex-row">
-              <a 
-                href="#cta" 
-                className="button-primary hover:bg-[var(--accent)]/90 transition-colors"
-                aria-label="Join Early Access"
-              >
-                Join Early Access →
+              <a href="#waitlist" className="button-primary">
+                Get early access
               </a>
-              <Link 
-                href="/dashboard" 
-                className="button-secondary hover:bg-white/10 transition-colors"
-                aria-label="Explore Platform"
-              >
-                Explore Platform
+              <Link href="/dashboard" className="button-secondary">
+                See the product shell
               </Link>
             </div>
 
@@ -139,14 +167,18 @@ export default function HomePage() {
                   <div className="text-sm text-[var(--muted)]">Reserve yield</div>
                   <div className="mt-2 flex items-end justify-between">
                     <div className="stat">4.82%</div>
-                    <div className="text-sm text-[var(--success)]">+ $2,184 this year</div>
+                    <div className="text-sm text-[var(--success)]">
+                      + $2,184 this year
+                    </div>
                   </div>
                 </div>
 
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="rounded-[22px] border border-white/10 bg-white/5 p-5">
                     <div className="text-sm text-[var(--muted)]">Payments</div>
-                    <div className="mt-2 text-xl font-semibold">Instant global rails</div>
+                    <div className="mt-2 text-xl font-semibold">
+                      Instant global rails
+                    </div>
                   </div>
                   <div className="rounded-[22px] border border-white/10 bg-white/5 p-5">
                     <div className="text-sm text-[var(--muted)]">Membership</div>
@@ -157,7 +189,9 @@ export default function HomePage() {
                 <div className="rounded-[22px] border border-white/10 bg-white/5 p-5">
                   <div className="flex items-center justify-between">
                     <div>
-                      <div className="text-sm text-[var(--muted)]">Capital products</div>
+                      <div className="text-sm text-[var(--muted)]">
+                        Capital products
+                      </div>
                       <div className="mt-2 text-xl font-semibold">
                         Treasury, credit, tokenized access
                       </div>
@@ -167,100 +201,6 @@ export default function HomePage() {
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-      </section>
-
-      <section id="moment" className="section-padding">
-        <div className="container">
-          <div className="max-w-3xl">
-            <div className="badge">Market moment</div>
-            <h2 className="section-title">
-              The financial system is ready
-              <br />
-              for its next evolution.
-            </h2>
-            <p className="section-copy">
-              Traditional finance struggles with legacy infrastructure while crypto
-              remains fragmented and inaccessible. Zaeux bridges this gap with a
-              unified platform that combines institutional-grade infrastructure
-              with consumer-friendly design.
-            </p>
-          </div>
-
-          <div className="section-grid md:grid-cols-3">
-          <div className="card">
-            <h3 className="text-2xl font-semibold tracking-[-0.04em]">
-              Infrastructure gap
-            </h3>
-            <p className="mt-4 text-base leading-7 text-[var(--muted)]">
-              Legacy systems weren't built for digital-first finance, creating
-              inefficiencies and limiting innovation.
-            </p>
-          </div>
-          <div className="card">
-            <h3 className="text-2xl font-semibold tracking-[-0.04em]">
-              Fragmentation
-            </h3>
-            <p className="mt-4 text-base leading-7 text-[var(--muted)]">
-              Crypto's ecosystem of disjointed tools creates complexity and
-              security risks for users and institutions.
-            </p>
-          </div>
-          <div className="card">
-            <h3 className="text-2xl font-semibold tracking-[-0.04em]">
-              Trust deficit
-            </h3>
-            <p className="mt-4 text-base leading-7 text-[var(--muted)]">
-              Both traditional finance and crypto struggle with transparency and
-              user confidence in their systems.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <section id="audience" className="container py-20">
-        <div className="max-w-3xl">
-          <div className="badge">Built for</div>
-          <h2 className="section-title mt-5">
-            The builders shaping
-            <br />
-            the future of finance.
-          </h2>
-          <p className="section-copy mt-6 max-w-2xl">
-            Zaeux serves forward-thinking individuals and institutions who demand
-            more from their financial systems - clarity, efficiency, and
-            innovation without compromise.
-          </p>
-        </div>
-
-        <div className="mt-10 grid gap-6 md:grid-cols-3">
-          <div className="card">
-            <h3 className="text-2xl font-semibold tracking-[-0.04em]">
-              Financial innovators
-            </h3>
-            <p className="mt-4 text-base leading-7 text-[var(--muted)]">
-              Teams building the next generation of financial products and
-              services.
-            </p>
-          </div>
-          <div className="card">
-            <h3 className="text-2xl font-semibold tracking-[-0.04em]">
-              Institutional pioneers
-            </h3>
-            <p className="mt-4 text-base leading-7 text-[var(--muted)]">
-              Organizations modernizing their financial infrastructure for the
-              digital age.
-            </p>
-          </div>
-          <div className="card">
-            <h3 className="text-2xl font-semibold tracking-[-0.04em]">
-              Empowered individuals
-            </h3>
-            <p className="mt-4 text-base leading-7 text-[var(--muted)]">
-              Users who want control, transparency, and growth from their
-              financial tools.
-            </p>
           </div>
         </div>
       </section>
@@ -312,7 +252,11 @@ export default function HomePage() {
 
         <div className="mt-10 grid gap-6 md:grid-cols-2">
           {products.map((product) => (
-            <div key={product.title} className="card min-h-[220px]">
+            <Link
+              key={product.title}
+              href={product.href}
+              className="card min-h-[220px] transition-transform hover:-translate-y-1"
+            >
               <div className="text-sm uppercase tracking-[0.18em] text-[var(--muted)]">
                 {product.title}
               </div>
@@ -322,106 +266,82 @@ export default function HomePage() {
               <p className="mt-5 max-w-xl text-base leading-7 text-[var(--muted)]">
                 {product.copy}
               </p>
-            </div>
+            </Link>
           ))}
         </div>
       </section>
 
-      <section id="platform" className="container py-20">
-        <div className="grid gap-6 md:grid-cols-4">
-          <div className="card">
-            <Building2 className="mb-4" />
-            <h3 className="text-xl font-semibold">Businesses</h3>
-            <p className="mt-3 text-sm leading-6 text-[var(--muted)]">
-              Treasury, settlements, and modern financial operations.
-            </p>
-          </div>
+      <section id="audience" className="container py-20">
+        <div className="max-w-3xl">
+          <div className="badge">Built for</div>
+          <h2 className="section-title mt-5">
+            A financial layer designed for
+            <br />
+            serious operators.
+          </h2>
+          <p className="section-copy mt-6 max-w-2xl">
+            Zaeux is built for people who want cleaner financial infrastructure,
+            better treasury logic, and a more modern foundation than siloed apps
+            and aging systems.
+          </p>
+        </div>
 
-          <div className="card">
-            <CreditCard className="mb-4" />
-            <h3 className="text-xl font-semibold">Consumers</h3>
-            <p className="mt-3 text-sm leading-6 text-[var(--muted)]">
-              A cleaner financial home for balances, movement, and growth.
-            </p>
-          </div>
-
-          <div className="card">
-            <Landmark className="mb-4" />
-            <h3 className="text-xl font-semibold">Institutions</h3>
-            <p className="mt-3 text-sm leading-6 text-[var(--muted)]">
-              A future-facing layer for partners who need serious rails.
-            </p>
-          </div>
-
-          <div className="card">
-            <Globe className="mb-4" />
-            <h3 className="text-xl font-semibold">Global access</h3>
-            <p className="mt-3 text-sm leading-6 text-[var(--muted)]">
-              Borderless movement, digital account logic, and programmable reach.
-            </p>
-          </div>
+        <div className="mt-10 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+          {audience.map((item) => {
+            const Icon = item.icon;
+            return (
+              <div key={item.title} className="card">
+                <div className="mb-5 inline-flex rounded-2xl border border-white/10 bg-white/5 p-3">
+                  <Icon size={20} />
+                </div>
+                <h3 className="text-2xl font-semibold tracking-[-0.04em]">
+                  {item.title}
+                </h3>
+                <p className="mt-4 text-base leading-7 text-[var(--muted)]">
+                  {item.copy}
+                </p>
+              </div>
+            );
+          })}
         </div>
       </section>
 
-      <section id="portfolio" className="container py-20">
-        <div className="max-w-3xl">
-          <div className="badge">Portfolio</div>
-          <h2 className="section-title mt-5">
-            Featured startups
-            <br />
-            building the future
-          </h2>
-        </div>
+      <section id="waitlist" className="container py-20">
+        <div className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr]">
+          <div className="card rounded-[36px] p-8 md:p-12">
+            <div className="badge">Early access</div>
+            <h2 className="section-title mt-5">
+              Join the early wave before
+              <br />
+              the full platform goes live.
+            </h2>
+            <p className="section-copy mt-6 max-w-2xl">
+              Start with the brand, the product shell, and the story. Then expand
+              into real accounts, real treasury products, and real infrastructure.
+            </p>
 
-        <div className="mt-10 grid gap-6 md:grid-cols-2">
-          <div className="card relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-[#7dd3fc]/10 to-[#c4b5fd]/10" />
-            <div className="relative z-10">
-              <div className="text-sm uppercase tracking-[0.18em] text-[var(--muted)]">
-                Featured Startup
-              </div>
-              <div className="mt-4 text-3xl font-semibold tracking-[-0.05em]">
-                Zaeux
-              </div>
-              <p className="mt-5 max-w-xl text-base leading-7 text-[var(--muted)]">
-                The onchain financial layer for people, businesses, and institutions.
-              </p>
-              <a
-                href="https://zaeux.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="button-primary mt-6"
-              >
-                Visit Zaeux →
+            <div className="mt-8 flex flex-col gap-4 sm:flex-row">
+              <Link href="/dashboard" className="button-primary">
+                Open preview product
+              </Link>
+              <a href="mailto:hello@zaeux.com" className="button-secondary">
+                hello@zaeux.com
               </a>
             </div>
           </div>
-        </div>
-      </section>
 
-      <section id="cta" className="container py-20">
-        <div className="card rounded-[36px] p-8 md:p-12 bg-gradient-to-br from-black/50 to-black/30 border border-white/10">
-          <div className="max-w-3xl mx-auto">
-            <div className="badge bg-[var(--accent)]/10 border-[var(--accent)]/20 text-[var(--accent)]">
-              Early Access
+          <div className="card rounded-[36px] p-8 md:p-12">
+            <div className="text-sm uppercase tracking-[0.18em] text-[var(--muted)]">
+              Get early access
             </div>
-            <h2 className="section-title mt-5">
-              Be among the first to experience
-              <br />
-              the future of finance
-            </h2>
-            <p className="section-copy mt-6 max-w-2xl">
-              Join our exclusive waitlist to gain early access to Zaeux's platform.
-              Experience seamless payments, smart treasury management, and innovative
-              financial products before anyone else.
+            <h3 className="mt-4 text-3xl font-semibold tracking-[-0.05em]">
+              Request access to Zaeux
+            </h3>
+            <p className="mt-4 text-base leading-7 text-[var(--muted)]">
+              Tell us who you are and what you want from the platform.
             </p>
-
             <div className="mt-8">
               <WaitlistForm />
-            </div>
-
-            <div className="mt-8 text-center text-sm text-[var(--muted)]">
-              Limited spots available. Priority access for early signups.
             </div>
           </div>
         </div>

@@ -1,37 +1,32 @@
-"use client";
+import * as React from "react";
+import { cn } from "@/lib/utils";
 
-import { clsx } from "clsx";
-import { ReactNode } from "react";
+type ButtonVariant = "primary" | "secondary" | "ghost";
 
-type ButtonProps = {
-  children: ReactNode;
-  className?: string;
-  disabled?: boolean;
-  variant?: "primary" | "secondary";
-} & React.ButtonHTMLAttributes<HTMLButtonElement>;
+type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
+  variant?: ButtonVariant;
+};
 
 export function Button({
-  children,
   className,
-  disabled,
   variant = "primary",
+  type = "button",
   ...props
 }: ButtonProps) {
   return (
     <button
-      className={clsx(
-        "rounded-lg px-4 py-2 text-sm font-medium transition-colors",
-        variant === "primary" && 
-          "bg-[var(--accent)] text-white hover:bg-[var(--accent)]/90",
+      type={type}
+      className={cn(
+        "inline-flex items-center justify-center rounded-2xl px-4 py-2.5 transition-colors disabled:cursor-not-allowed disabled:opacity-50",
+        variant === "primary" &&
+          "bg-white text-black hover:bg-white/90",
         variant === "secondary" &&
-          "border border-white/10 bg-white/5 hover:bg-white/10",
-        disabled && "opacity-50 cursor-not-allowed",
+          "border border-white/10 bg-white/5 text-white hover:bg-white/10",
+        variant === "ghost" &&
+          "bg-transparent text-white/75 hover:bg-white/5 hover:text-white",
         className
       )}
-      disabled={disabled}
       {...props}
-    >
-      {children}
-    </button>
+    />
   );
 }
