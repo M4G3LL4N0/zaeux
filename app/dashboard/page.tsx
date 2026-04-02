@@ -11,125 +11,156 @@ import {
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
-type Account = {
+type AccountRow = {
   id: string;
-  balance: number;
-  yield_earned: number;
-  currency: string;
-  status: string;
+  user_id: string;
+  account_type?: string | null;
+  currency?: string | null;
+  balance?: string | number | null;
+  yield_earned?: string | number | null;
+  status?: string | null;
 };
 
-type Transaction = {
+type TransactionRow = {
   id: string;
-  amount: number;
-  currency: string;
-  type: 'credit' | 'debit';
-  description: string | null;
-  created_at: string;
+  user_id: string;
+  account_id?: string | null;
+  amount?: string | number | null;
+  currency?: string | null;
+  type?: string | null;
+  status?: string | null;
+  description?: string | null;
+  created_at?: string | null;
 };
 
 export default function DashboardPage() {
   const router = useRouter();
+
   const [loading, setLoading] = useState(true);
+  const [isAuthed, setIsAuthed] = useState(false);
   const [email, setEmail] = useState("");
-  const [accounts, setAccounts] = useState<Account[]>([]);
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [accounts, setAccounts] = useState<AccountRow[]>([]);
+  const [transactions, setTransactions] = useState<TransactionRow[]>([]);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const fetchData = async () => {
+    let isMounted = true;
+
+    async function loadDashboard() {
       try {
         setLoading(true);
         setError("");
 
-        // Get authenticated user
-        const { data: { user }, error: authError } = await supabase.auth.getUser();
-        if (authError || !user) {
-          router.push("/login");
+        const {
+          data: { user },
+          error: userError,
+        } = await supabase.auth.getUser();
+
+        if (userError) throw userError;
+
+        if (!user) {
+          if (!isMounted) return;
+          setIsAuthed(false);
+          setEmail("");
+          setAccounts([]);
+          setTransactions([]);
           return;
         }
 
-        // Set user email
-        setEmail(user.email || "");
+        if (!isMounted) return;
 
-        // Ensure profile exists
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .upsert({
-            id: user.id,
-            email: user.email,
-            display_name: user.email?.split('@')[0] || null,
-            updated_at: new Date().toISOString(),
-          }, { onConflict: 'id' });
+        setIsAuthed(true);
+        setEmail(user.email ?? "");
+
+        const { data: existingProfile, error: profileError } = await supabase
+          .from("profiles")
+          .select("id")
+          .eq("id", user.id)
+          .maybeSingle();
 
         if (profileError) throw profileError;
 
-        // Get or create primary account
-        const { data: accountsData, error: accountsError } = await supabase
-          .from('accounts')
-          .select('id, balance, yield_earned, currency, status')
-          .eq('user_id', user.id)
-          .order('created_at', { ascending: false })
-          .limit(1);
+        if (!existingProfile) {
+          const { error: insertProfileError } = await supabase.from("profiles").insert([
+            {
+              id: user.id,
+              email: user.email ?? null,
+              display_name: user.user_metadata?.display_name ?? null,
+            },
+          ]);
+
+          if (insertProfileError) throw insertProfileError;
+        }
+
+        const { data: accountRows, error: accountsError } = await supabase
+          .from("accounts")
+          .select("*")
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: false });
 
         if (accountsError) throw accountsError;
 
-        let primaryAccount = accountsData?.[0];
-        if (!primaryAccount) {
-          const { data: newAccount, error: createError } = await supabase
-            .from('accounts')
-            .insert({
-              user_id: user.id,
-              account_type: 'primary',
-              currency: 'USD',
-              balance: 0,
-              yield_earned: 0,
-              status: 'active',
-            })
-            .select('id, balance, yield_earned, currency, status')
-            .single();
+        let resolvedAccounts = accountRows ?? [];
 
-          if (createError) throw createError;
-          primaryAccount = newAccount;
+        if (resolvedAccounts.length === 0) {
+          const { data: insertedAccounts, error: createAccountError } = await supabase
+            .from("accounts")
+            .insert([
+              {
+                user_id: user.id,
+                account_type: "primary",
+                currency: "USD",
+                balance: 0,
+                yield_earned: 0,
+                status: "active",
+              },
+            ])
+            .select("*");
+
+          if (createAccountError) throw createAccountError;
+
+          resolvedAccounts = insertedAccounts ?? [];
         }
 
-        // Get recent transactions
-        const { data: transactionsData, error: transactionsError } = await supabase
-          .from('transactions')
-          .select('id, amount, currency, type, description, created_at')
-          .eq('user_id', user.id)
-          .order('created_at', { ascending: false })
+        const { data: transactionRows, error: transactionsError } = await supabase
+          .from("transactions")
+          .select("*")
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: false })
           .limit(8);
 
         if (transactionsError) throw transactionsError;
 
-        // Update state
-        setAccounts(primaryAccount ? [primaryAccount] : []);
-        setTransactions(transactionsData || []);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to load dashboard");
-        console.error("Dashboard error:", err);
-        router.push("/login");
-      } finally {
-        setLoading(false);
-      }
-    };
+        if (!isMounted) return;
 
-    fetchData();
-  }, [router]);
+        setAccounts(resolvedAccounts);
+        setTransactions(transactionRows ?? []);
+      } catch (err) {
+        if (!isMounted) return;
+        setError(err instanceof Error ? err.message : "Failed to load dashboard.");
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    }
+
+    loadDashboard();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const primaryAccount = accounts[0];
 
   const totalBalance = useMemo(() => {
-    return accounts.reduce((sum, account) => {
-      return sum + Number(account.balance ?? 0);
-    }, 0);
+    return accounts.reduce((sum, account) => sum + Number(account.balance ?? 0), 0);
   }, [accounts]);
 
   const totalYield = useMemo(() => {
-    return accounts.reduce((sum, account) => {
-      return sum + Number(account.yield_earned ?? 0);
-    }, 0);
+    return accounts.reduce(
+      (sum, account) => sum + Number(account.yield_earned ?? 0),
+      0
+    );
   }, [accounts]);
 
   async function handleSignOut() {
@@ -144,7 +175,9 @@ export default function DashboardPage() {
         <div className="mx-auto max-w-7xl">
           <div className="card rounded-[32px] p-7">
             <div className="text-sm text-[var(--muted)]">Zaeux dashboard</div>
-            <h1 className="mt-3 text-4xl font-bold tracking-[-0.06em]">Loading account…</h1>
+            <h1 className="mt-3 text-4xl font-bold tracking-[-0.06em]">
+              Loading account…
+            </h1>
           </div>
         </div>
       </main>
@@ -163,7 +196,8 @@ export default function DashboardPage() {
               Sign in to access your dashboard
             </h1>
             <p className="mt-5 max-w-2xl text-base leading-7 text-[var(--muted)]">
-              Your live account, balances, and transaction activity appear here once you log in.
+              Your live account, balances, and transaction activity appear here
+              once you log in.
             </p>
             <div className="mt-8 flex flex-wrap gap-4">
               <button className="button-primary" onClick={() => router.push("/login")}>
@@ -180,34 +214,39 @@ export default function DashboardPage() {
   }
 
   return (
-    <main className="min-h-screen bg-black/50">
-      <DashboardSidebar />
-      <DashboardHeader email={email} />
-      
-      <div className="md:pl-64">
-        <div className="pt-16">
-          <div className="container px-6 py-8">
-        <div className="mb-8">
-          <div className="text-sm uppercase tracking-[0.2em] text-[var(--muted)]">
-            Your Financial Control Center
+    <main className="min-h-screen px-6 py-8">
+      <div className="mx-auto max-w-7xl">
+        <div className="mb-8 flex flex-col justify-between gap-5 md:flex-row md:items-center">
+          <div>
+            <div className="text-sm uppercase tracking-[0.2em] text-[var(--muted)]">
+              Zaeux dashboard
+            </div>
+            <h1 className="mt-2 text-5xl font-bold tracking-[-0.06em]">Overview</h1>
+            {email ? <div className="mt-3 text-sm text-[var(--muted)]">{email}</div> : null}
           </div>
-          <h1 className="mt-2 text-5xl font-bold tracking-[-0.06em]">Dashboard Overview</h1>
+
+          <div className="flex gap-3">
+            <button className="button-secondary" onClick={() => router.push("/")}>
+              Back to site
+            </button>
+            <button className="button-primary" onClick={handleSignOut}>
+              Sign out
+            </button>
+          </div>
         </div>
 
-        {error && (
+        {error ? (
           <div className="mb-6 card rounded-[24px] p-5">
-            <div className="text-sm text-red-300">
-              Error: {error}. Please try again or contact support if the issue persists.
-            </div>
+            <div className="text-sm text-red-300">{error}</div>
           </div>
-        )}
+        ) : null}
 
-        <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr]">
+        <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
           <section className="grid gap-6">
-            <div className="card rounded-2xl p-6">
+            <div className="card rounded-[32px] p-7">
               <div className="flex items-start justify-between">
                 <div>
-                  <div className="text-sm text-[var(--muted)]">Your Total Balance</div>
+                  <div className="text-sm text-[var(--muted)]">Total balance</div>
                   <div className="mt-2 text-6xl font-bold tracking-[-0.07em]">
                     $
                     {totalBalance.toLocaleString(undefined, {
@@ -229,8 +268,8 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            <div className="grid gap-6 md:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3">
-              <div className="card rounded-2xl p-5">
+            <div className="grid gap-6 md:grid-cols-3">
+              <div className="card">
                 <div className="mb-4 inline-flex rounded-2xl border border-white/10 bg-white/5 p-3">
                   <BarChart3 size={20} />
                 </div>
@@ -259,23 +298,26 @@ export default function DashboardPage() {
                   <Shield size={20} />
                 </div>
                 <div className="text-sm text-[var(--muted)]">Membership</div>
-                <div className="mt-2 text-3xl font-semibold tracking-[-0.05em]">Active</div>
+                <div className="mt-2 text-3xl font-semibold tracking-[-0.05em]">
+                  Active
+                </div>
               </div>
             </div>
 
-            <div className="card rounded-2xl p-6">
+            <div className="card rounded-[32px] p-7">
               <div className="flex items-center justify-between">
                 <div>
                   <div className="text-sm text-[var(--muted)]">Primary account</div>
                   <h2 className="mt-2 text-3xl font-semibold tracking-[-0.05em]">
-                    {primaryAccount?.account_type ?? "Primary"} · {primaryAccount?.currency ?? "USD"}
+                    {primaryAccount?.account_type ?? "Primary"} ·{" "}
+                    {primaryAccount?.currency ?? "USD"}
                   </h2>
                 </div>
                 <ArrowUpRight />
               </div>
 
-              <div className="mt-6 grid gap-4 md:grid-cols-2">
-                <div className="card rounded-xl p-4">
+              <div className="mt-8 grid gap-4 md:grid-cols-2">
+                <div className="rounded-[22px] border border-white/10 bg-white/5 p-5">
                   <div className="text-sm text-[var(--muted)]">Status</div>
                   <div className="mt-2 text-xl font-semibold">
                     {primaryAccount?.status ?? "active"}
@@ -310,7 +352,7 @@ export default function DashboardPage() {
           </section>
 
           <aside className="grid gap-6">
-            <div className="card rounded-2xl p-6">
+            <div className="card rounded-[32px] p-7">
               <div className="text-sm text-[var(--muted)]">Recent activity</div>
               <div className="mt-5 space-y-4">
                 {transactions.length > 0 ? (
@@ -349,7 +391,7 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            <div className="card rounded-2xl p-6">
+            <div className="card rounded-[32px] p-7">
               <div className="text-sm text-[var(--muted)]">Next steps</div>
               <ul className="mt-5 space-y-3 text-sm leading-6 text-[var(--muted)]">
                 <li>• Add wallet connection or magic-link auth polish</li>
@@ -359,7 +401,6 @@ export default function DashboardPage() {
               </ul>
             </div>
           </aside>
-          </div>
         </div>
       </div>
     </main>
