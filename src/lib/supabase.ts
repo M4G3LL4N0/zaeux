@@ -7,6 +7,30 @@ export const supabase = createClient(supabaseUrl, supabaseKey, {
   db: { schema: "zaeux" },
 });
 
+export async function getUser() {
+  const { data: { user }, error } = await supabase.auth.getUser();
+  if (error) throw error;
+  return user;
+}
+
+export async function ensureProfile(userId: string, email: string) {
+  const { data: profile, error } = await supabase
+    .from("profiles")
+    .select("*")
+    .eq("id", userId)
+    .maybeSingle();
+
+  if (error) throw error;
+
+  if (!profile) {
+    const { error: insertError } = await supabase
+      .from("profiles")
+      .insert([{ id: userId, email }]);
+    
+    if (insertError) throw insertError;
+  }
+}
+
 export type Profile = {
   id: string;
   email: string | null;

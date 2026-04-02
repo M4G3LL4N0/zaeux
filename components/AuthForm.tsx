@@ -36,22 +36,20 @@ export function AuthForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <div>
+      <div className="space-y-2">
         <label htmlFor="email" className="block text-sm font-medium text-[var(--muted)]">
           Work email
         </label>
-        <div className="mt-2">
-          <input
-            type="email"
-            id="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Enter your work email"
-            className="input-primary w-full"
-            required
-            disabled={isLoading}
-          />
-        </div>
+        <input
+          type="email"
+          id="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="name@company.com"
+          className="input-primary w-full"
+          required
+          disabled={isLoading}
+        />
       </div>
 
       {error && (
@@ -60,13 +58,25 @@ export function AuthForm() {
         </div>
       )}
 
-      <button
+      <Button
         type="submit"
-        className="button-primary w-full"
+        className="w-full"
+        variant="primary"
         disabled={isLoading}
       >
-        {isLoading ? "Sending magic link..." : "Continue with email"}
-      </button>
+        {isLoading ? (
+          <>
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            Sending magic link...
+          </>
+        ) : (
+          "Continue with email"
+        )}
+      </Button>
+
+      <p className="text-center text-sm text-[var(--muted)]">
+        We'll email you a secure login link.
+      </p>
     </form>
   );
 }

@@ -25,10 +25,18 @@ export function WaitlistForm() {
       setError("Please enter your email address");
       return false;
     }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+    
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
       setError("Please enter a valid email address");
       return false;
     }
+
+    if (formData.full_name.trim().length < 2) {
+      setError("Please enter your full name");
+      return false;
+    }
+
     return true;
   };
 

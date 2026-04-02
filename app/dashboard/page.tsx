@@ -31,48 +31,19 @@ export default function DashboardPage() {
         setLoading(true);
         setError("");
 
-        const {
-          data: { user },
-          error: userError,
-        } = await supabase.auth.getUser();
-
-        if (userError) throw userError;
-
+        const user = await getUser();
+        
         if (!user) {
-          if (!isMounted) return;
           setIsAuthed(false);
-          setEmail("");
-          setAccounts([]);
-          setTransactions([]);
           return;
         }
-
-        if (!isMounted) return;
 
         setIsAuthed(true);
         setEmail(user.email ?? "");
 
-        const { data: existingProfile, error: profileError } = await supabase
-          .from("profiles")
-          .select("id")
-          .eq("id", user.id)
-          .maybeSingle();
+        await ensureProfile(user.id, user.email ?? "");
 
-        if (profileError) throw profileError;
-
-        if (!existingProfile) {
-          const { error: insertProfileError } = await supabase.from("profiles").insert([
-            {
-              id: user.id,
-              email: user.email ?? null,
-              display_name: user.user_metadata?.display_name ?? null,
-            },
-          ]);
-
-          if (insertProfileError) throw insertProfileError;
-        }
-
-        const { data: accountRows, error: accountsError } = await supabase
+        const { data: accounts, error: accountsError } = await supabase
           .from("accounts")
           .select("*")
           .eq("user_id", user.id)
@@ -80,29 +51,26 @@ export default function DashboardPage() {
 
         if (accountsError) throw accountsError;
 
-        let resolvedAccounts = accountRows ?? [];
+        let resolvedAccounts = accounts ?? [];
 
         if (resolvedAccounts.length === 0) {
-          const { data: insertedAccounts, error: createAccountError } = await supabase
+          const { data: newAccounts, error: createError } = await supabase
             .from("accounts")
-            .insert([
-              {
-                user_id: user.id,
-                account_type: "primary",
-                currency: "USD",
-                balance: 0,
-                yield_earned: 0,
-                status: "active",
-              },
-            ])
+            .insert([{
+              user_id: user.id,
+              account_type: "primary",
+              currency: "USD",
+              balance: 0,
+              yield_earned: 0,
+              status: "active"
+            }])
             .select("*");
 
-          if (createAccountError) throw createAccountError;
-
-          resolvedAccounts = insertedAccounts ?? [];
+          if (createError) throw createError;
+          resolvedAccounts = newAccounts ?? [];
         }
 
-        const { data: transactionRows, error: transactionsError } = await supabase
+        const { data: transactions, error: transactionsError } = await supabase
           .from("transactions")
           .select("*")
           .eq("user_id", user.id)
@@ -111,23 +79,21 @@ export default function DashboardPage() {
 
         if (transactionsError) throw transactionsError;
 
-        if (!isMounted) return;
-
-        setAccounts(resolvedAccounts);
-        setTransactions(transactionRows ?? []);
+        if (isMounted) {
+          setAccounts(resolvedAccounts);
+          setTransactions(transactions ?? []);
+        }
       } catch (err) {
-        if (!isMounted) return;
-        setError(err instanceof Error ? err.message : "Failed to load dashboard.");
+        if (isMounted) {
+          setError(err instanceof Error ? err.message : "Failed to load dashboard");
+        }
       } finally {
         if (isMounted) setLoading(false);
       }
     }
 
     loadDashboard();
-
-    return () => {
-      isMounted = false;
-    };
+    return () => { isMounted = false };
   }, []);
 
   const primaryAccount = accounts[0];
@@ -221,7 +187,10 @@ export default function DashboardPage() {
           </div>
         ) : null}
 
-        <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
+        <div className="grid gap-6 lg:grid-cols-[1fr_0.8fr]">
+          <DashboardSidebar />
+          
+          <div className="space-y-6">
           <section className="grid gap-6">
             <div className="card rounded-[32px] p-7">
               <div className="flex items-start justify-between">
