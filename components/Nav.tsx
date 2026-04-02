@@ -9,7 +9,7 @@ export function Nav() {
             Zaeux
           </span>
         </Link>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           <Link
             href="/pay"
             className="nav-link"
