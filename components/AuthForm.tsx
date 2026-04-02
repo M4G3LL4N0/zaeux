@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react";
 
 export function AuthForm() {
   const router = useRouter();
