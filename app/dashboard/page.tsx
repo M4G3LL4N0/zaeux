@@ -11,27 +11,7 @@ import {
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
-type AccountRow = {
-  id: string;
-  user_id: string;
-  account_type?: string | null;
-  currency?: string | null;
-  balance?: string | number | null;
-  yield_earned?: string | number | null;
-  status?: string | null;
-};
-
-type TransactionRow = {
-  id: string;
-  user_id: string;
-  account_id?: string | null;
-  amount?: string | number | null;
-  currency?: string | null;
-  type?: string | null;
-  status?: string | null;
-  description?: string | null;
-  created_at?: string | null;
-};
+import type { Profile, Account, Transaction } from "@/lib/supabase";
 
 export default function DashboardPage() {
   const router = useRouter();

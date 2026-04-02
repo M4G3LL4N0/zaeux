@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { Button } from "@/components/ui/button";
 
 export function AuthForm() {
   const router = useRouter();

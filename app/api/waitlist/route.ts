@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 
-type WaitlistEntry = {
+import type { WaitlistEntry } from "@/lib/supabase";
+
+type WaitlistPayload = {
   full_name?: string | null;
   email: string;
   company?: string | null;

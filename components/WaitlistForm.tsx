@@ -21,10 +21,6 @@ export function WaitlistForm() {
   const [error, setError] = useState<string | null>(null);
 
   const validateForm = () => {
-    if (!formData.full_name.trim()) {
-      setError("Please enter your full name");
-      return false;
-    }
     if (!formData.email.trim()) {
       setError("Please enter your email address");
       return false;
