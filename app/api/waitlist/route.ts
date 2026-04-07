@@ -1,11 +1,9 @@
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
-
-import type { WaitlistEntry } from "@/lib/supabase";
+import { createClient } from "@supabase/supabase-js";
 
 type WaitlistPayload = {
   full_name?: string | null;
-  email: string;
+  email?: string | null;
   company?: string | null;
   interest?: string | null;
   source?: string | null;
@@ -16,11 +14,26 @@ function isValidEmail(value: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 }
 
+function getServerSupabase() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (!url || !key) {
+    throw new Error(
+      "Missing Supabase environment variables. Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in Vercel."
+    );
+  }
+
+  return createClient(url, key, {
+    db: { schema: "zaeux" },
+  });
+}
+
 export async function POST(request: Request) {
   try {
-    const body = (await request.json()) as Partial<WaitlistEntry>;
+    const body = (await request.json()) as WaitlistPayload;
 
-    const payload: WaitlistEntry = {
+    const payload = {
       full_name: body.full_name?.trim() || null,
       email: body.email?.trim() || "",
       company: body.company?.trim() || null,
@@ -35,6 +48,8 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
+
+    const supabase = getServerSupabase();
 
     const { error } = await supabase.from("waitlist").insert([payload]);
 

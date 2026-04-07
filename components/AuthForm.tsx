@@ -2,68 +2,103 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Loader2, Mail } from "lucide-react";
 import { supabase } from "@/lib/supabase";
-import { Button } from "@/components/ui/button";
-import { Loader2 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
-export function AuthForm() {
+type AuthFormProps = {
+  className?: string;
+};
+
+export function AuthForm({ className }: AuthFormProps) {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState("");
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    const normalizedEmail = email.trim().toLowerCase();
+
+    if (!normalizedEmail) {
+      setError("Email is required.");
+      return;
+    }
+
     setIsLoading(true);
     setError("");
+    setIsSuccess(false);
 
     try {
-      const { error } = await supabase.auth.signInWithOtp({
-        email,
+      const redirectTo =
+        typeof window !== "undefined"
+          ? `${window.location.origin}/dashboard`
+          : undefined;
+
+      const { error: signInError } = await supabase.auth.signInWithOtp({
+        email: normalizedEmail,
         options: {
-          emailRedirectTo: `${window.location.origin}/dashboard`,
+          emailRedirectTo: redirectTo,
         },
       });
 
-      if (error) throw error;
+      if (signInError) {
+        throw signInError;
+      }
 
-      router.push("/dashboard");
+      setIsSuccess(true);
+      setEmail("");
+      router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Login failed");
+      setError(err instanceof Error ? err.message : "Failed to send magic link.");
     } finally {
       setIsLoading(false);
     }
-  };
+  }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form className={cn("space-y-4", className)} onSubmit={handleSubmit}>
       <div className="space-y-2">
-        <label htmlFor="email" className="block text-sm font-medium text-[var(--muted)]">
-          Work email
+        <label
+          htmlFor="email"
+          className="text-sm font-medium text-[var(--foreground)]"
+        >
+          Email address
         </label>
-        <input
-          type="email"
-          id="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="name@company.com"
-          className="input-primary w-full"
-          required
-          disabled={isLoading}
-        />
+        <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+          <Mail className="h-4 w-4 text-[var(--muted)]" />
+          <input
+            id="email"
+            name="email"
+            type="email"
+            autoComplete="email"
+            placeholder="you@company.com"
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+            className="w-full bg-transparent text-sm text-white outline-none placeholder:text-[var(--muted)]"
+            disabled={isLoading}
+          />
+        </div>
       </div>
 
-      {error && (
-        <div className="rounded-lg bg-red-500/10 p-3 text-sm text-red-300">
+      {error ? (
+        <div className="rounded-2xl border border-red-400/20 bg-red-500/10 px-4 py-3 text-sm text-red-200">
           {error}
         </div>
-      )}
+      ) : null}
 
-      <Button
+      {isSuccess ? (
+        <div className="rounded-2xl border border-emerald-400/20 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200">
+          Magic link sent. Check your email to continue.
+        </div>
+      ) : null}
+
+      <button
         type="submit"
-        className="w-full"
-        variant="primary"
         disabled={isLoading}
+        className="inline-flex w-full items-center justify-center rounded-2xl bg-white px-4 py-3 text-sm font-semibold text-black transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-70"
       >
         {isLoading ? (
           <>
@@ -71,13 +106,9 @@ export function AuthForm() {
             Sending magic link...
           </>
         ) : (
-          "Continue with email"
+          "Send magic link"
         )}
-      </Button>
-
-      <p className="text-center text-sm text-[var(--muted)]">
-        We'll email you a secure login link.
-      </p>
+      </button>
     </form>
   );
 }

@@ -1,25 +1,11 @@
 import { createClient } from "@supabase/supabase-js";
 
-if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
-  throw new Error("NEXT_PUBLIC_SUPABASE_URL is not defined");
-}
+const supabaseUrl =
+  process.env.NEXT_PUBLIC_SUPABASE_URL || "https://placeholder.supabase.co";
 
-if (!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-  throw new Error("NEXT_PUBLIC_SUPABASE_ANON_KEY is not defined");
-}
+const supabaseAnonKey =
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "placeholder-anon-key";
 
-export const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-  {
-    auth: {
-      flowType: "pkce",
-      persistSession: true,
-      autoRefreshToken: true,
-      detectSessionInUrl: true,
-    },
-    db: {
-      schema: "zaeux",
-    },
-  }
-);
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  db: { schema: "zaeux" },
+});
