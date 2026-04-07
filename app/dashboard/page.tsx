@@ -182,6 +182,9 @@ export default function DashboardPage() {
             <h1 className="mt-3 text-4xl font-bold tracking-[-0.06em]">
               Loading account…
             </h1>
+            <div className="mt-6 h-2 w-48 rounded-full bg-white/10 overflow-hidden">
+              <div className="h-full bg-gradient-to-r from-[#7dd3fc] to-[#c4b5fd] animate-pulse" />
+            </div>
           </div>
         </div>
       </main>

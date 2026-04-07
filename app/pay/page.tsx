@@ -55,6 +55,105 @@ export default function PayPage() {
           </div>
         </div>
       </section>
+
+      <section className="section-padding bg-black/20">
+        <div className="container">
+          <div className="max-w-3xl">
+            <h2 className="section-subtitle">
+              Payment infrastructure
+              <br />
+              for modern businesses
+            </h2>
+            <p className="section-copy">
+              Zaeux Pay provides the tools businesses need to move money globally
+              with speed, clarity, and control.
+            </p>
+          </div>
+
+          <div className="mt-12 grid gap-6 md:grid-cols-2">
+            <div className="card">
+              <h3 className="text-2xl font-semibold tracking-[-0.04em]">
+                Multi-Currency Accounts
+              </h3>
+              <p className="mt-4 text-base leading-7 text-[var(--muted)]">
+                Hold, send, and receive funds in multiple currencies with
+                competitive exchange rates.
+              </p>
+            </div>
+            <div className="card">
+              <h3 className="text-2xl font-semibold tracking-[-0.04em]">
+                Batch Payments
+              </h3>
+              <p className="mt-4 text-base leading-7 text-[var(--muted)]">
+                Send multiple payments at once with bulk processing and
+                customizable templates.
+              </p>
+            </div>
+            <div className="card">
+              <h3 className="text-2xl font-semibold tracking-[-0.04em]">
+                Payment Links
+              </h3>
+              <p className="mt-4 text-base leading-7 text-[var(--muted)]">
+                Create and share payment links for easy invoice collection and
+                one-time payments.
+              </p>
+            </div>
+            <div className="card">
+              <h3 className="text-2xl font-semibold tracking-[-0.04em]">
+                API Integration
+              </h3>
+              <p className="mt-4 text-base leading-7 text-[var(--muted)]">
+                Integrate Zaeux Pay into your existing systems with our developer
+                APIs and SDKs.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="section-padding">
+        <div className="container">
+          <div className="max-w-3xl">
+            <h2 className="section-subtitle">
+              Built for global scale
+            </h2>
+            <p className="section-copy">
+              Zaeux Pay is designed to handle the needs of businesses operating
+              across borders and currencies.
+            </p>
+          </div>
+
+          <div className="mt-12 grid gap-6 md:grid-cols-3">
+            <div className="card">
+              <h3 className="text-2xl font-semibold tracking-[-0.04em]">
+                Compliance Ready
+              </h3>
+              <p className="mt-4 text-base leading-7 text-[var(--muted)]">
+                Built with global compliance standards in mind, including KYC/AML
+                and regulatory requirements.
+              </p>
+            </div>
+            <div className="card">
+              <h3 className="text-2xl font-semibold tracking-[-0.04em]">
+                Fraud Protection
+              </h3>
+              <p className="mt-4 text-base leading-7 text-[var(--muted)]">
+                Advanced fraud detection and prevention systems to protect your
+                transactions.
+              </p>
+            </div>
+            <div className="card">
+              <h3 className="text-2xl font-semibold tracking-[-0.04em]">
+                24/7 Support
+              </h3>
+              <p className="mt-4 text-base leading-7 text-[var(--muted)]">
+                Dedicated support team available around the clock to assist with
+                any issues.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
     </main>
   );
 }

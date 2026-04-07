@@ -4,11 +4,12 @@ import { useState } from "react";
 
 export function WaitlistForm() {
   const [formData, setFormData] = useState({
-    name: "",
+    full_name: "",
     email: "",
     company: ""
   });
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,14 +24,16 @@ export function WaitlistForm() {
         body: JSON.stringify(formData),
       });
 
-      if (response.ok) {
-        setStatus("success");
-        setFormData({ name: "", email: "", company: "" });
-      } else {
-        setStatus("error");
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to join waitlist");
       }
+      
+      setStatus("success");
+      setFormData({ full_name: "", email: "", company: "" });
     } catch (err) {
       setStatus("error");
+      setErrorMessage(err instanceof Error ? err.message : "An unexpected error occurred");
     }
   };
 
@@ -47,11 +50,11 @@ export function WaitlistForm() {
             Full name
           </label>
           <input
-            id="name"
-            name="name"
+            id="full_name"
+            name="full_name"
             type="text"
             required
-            value={formData.name}
+            value={formData.full_name}
             onChange={handleChange}
             className="w-full rounded-[16px] border border-white/15 bg-white/5 px-5 py-4 text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-white/20"
             placeholder="Alex Johnson"
@@ -105,7 +108,7 @@ export function WaitlistForm() {
 
       {status === "error" && (
         <div className="rounded-[16px] bg-red-900/30 p-4 text-center text-red-300">
-          Something went wrong. Please try again.
+          {errorMessage || "Something went wrong. Please try again."}
         </div>
       )}
     </form>

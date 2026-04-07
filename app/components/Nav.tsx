@@ -19,13 +19,13 @@ export function Nav() {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <nav className="sticky top-0 z-50 nav-blur">
-      <div className="container flex h-18 items-center justify-between py-4">
-        <Link href="/" className="text-xl font-semibold tracking-[-0.08em]">
+    <nav className="sticky top-0 z-50 nav-blur border-b border-white/10">
+      <div className="container flex h-20 items-center justify-between px-6">
+        <Link href="/" className="text-xl font-bold tracking-tighter bg-gradient-to-r from-[#7dd3fc] to-[#c4b5fd] bg-clip-text text-transparent">
           Zaeux
         </Link>
 
-        <div className="hidden items-center gap-8 md:flex">
+        <div className="hidden items-center gap-6 md:flex">
           {navItems.map((item) => (
             <Link
               key={item.name}
@@ -38,16 +38,16 @@ export function Nav() {
         </div>
 
         <div className="flex items-center gap-3">
-          <Link href="/dashboard" className="button-secondary text-sm">
+          <Link href="/dashboard" className="button-secondary">
             Preview product
           </Link>
-          <a href="#cta" className="button-primary text-sm">
+          <a href="#cta" className="button-primary">
             Join waitlist
           </a>
 
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="md:hidden"
+            className="md:hidden rounded-lg p-2 hover:bg-white/5 transition-colors"
             aria-label="Toggle menu"
           >
             {isOpen ? <X size={20} /> : <Menu size={20} />}
