@@ -8,6 +8,11 @@ import {
   CreditCard,
   Shield,
   Wallet,
+  Send,
+  Plus,
+  ArrowDown,
+  ArrowUp,
+  PieChart,
 } from "lucide-react";
 import { supabase } from "@/src/lib/supabase";
 
@@ -275,7 +280,7 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            <div className="grid gap-6 md:grid-cols-3">
+            <div className="grid gap-6 md:grid-cols-4">
               <div className="card">
                 <div className="mb-4 inline-flex rounded-2xl border border-white/10 bg-white/5 p-3">
                   <BarChart3 size={20} />
@@ -288,6 +293,9 @@ export default function DashboardPage() {
                     maximumFractionDigits: 2,
                   })}
                 </div>
+                <div className="mt-2 text-xs text-[var(--success)]">
+                  +4.8% APY
+                </div>
               </div>
 
               <div className="card">
@@ -297,6 +305,9 @@ export default function DashboardPage() {
                 <div className="text-sm text-[var(--muted)]">Transactions</div>
                 <div className="mt-2 text-3xl font-semibold tracking-[-0.05em]">
                   {transactions.length}
+                </div>
+                <div className="mt-2 text-xs text-[var(--muted)]">
+                  Last 30 days
                 </div>
               </div>
 
@@ -308,6 +319,46 @@ export default function DashboardPage() {
                 <div className="mt-2 text-3xl font-semibold tracking-[-0.05em]">
                   Active
                 </div>
+                <div className="mt-2 text-xs text-[var(--muted)]">
+                  Tier 1 access
+                </div>
+              </div>
+
+              <div className="card">
+                <div className="mb-4 inline-flex rounded-2xl border border-white/10 bg-white/5 p-3">
+                  <PieChart size={20} />
+                </div>
+                <div className="text-sm text-[var(--muted)]">Allocation</div>
+                <div className="mt-2 text-3xl font-semibold tracking-[-0.05em]">
+                  {accounts.length}
+                </div>
+                <div className="mt-2 text-xs text-[var(--muted)]">
+                  Accounts
+                </div>
+              </div>
+            </div>
+
+            <div className="card rounded-[32px] p-7">
+              <div className="flex items-center justify-between">
+                <div className="text-sm text-[var(--muted)]">Quick actions</div>
+              </div>
+              <div className="mt-6 grid grid-cols-4 gap-4">
+                <button className="flex flex-col items-center gap-2 rounded-2xl border border-white/10 bg-white/5 p-4 transition-colors hover:bg-white/10">
+                  <Send size={20} />
+                  <span className="text-sm">Send</span>
+                </button>
+                <button className="flex flex-col items-center gap-2 rounded-2xl border border-white/10 bg-white/5 p-4 transition-colors hover:bg-white/10">
+                  <ArrowDown size={20} />
+                  <span className="text-sm">Deposit</span>
+                </button>
+                <button className="flex flex-col items-center gap-2 rounded-2xl border border-white/10 bg-white/5 p-4 transition-colors hover:bg-white/10">
+                  <ArrowUp size={20} />
+                  <span className="text-sm">Withdraw</span>
+                </button>
+                <button className="flex flex-col items-center gap-2 rounded-2xl border border-white/10 bg-white/5 p-4 transition-colors hover:bg-white/10">
+                  <Plus size={20} />
+                  <span className="text-sm">New Account</span>
+                </button>
               </div>
             </div>
 
@@ -320,12 +371,18 @@ export default function DashboardPage() {
                     {primaryAccount?.currency ?? "USD"}
                   </h2>
                 </div>
-                <ArrowUpRight />
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-[var(--muted)]">Active</span>
+                  <div className="h-2 w-2 rounded-full bg-[var(--success)]" />
+                </div>
               </div>
 
               <div className="mt-8 grid gap-4 md:grid-cols-2">
                 <div className="rounded-[22px] border border-white/10 bg-white/5 p-5">
-                  <div className="text-sm text-[var(--muted)]">Status</div>
+                  <div className="flex items-center justify-between">
+                    <div className="text-sm text-[var(--muted)]">Status</div>
+                    <div className="h-2 w-2 rounded-full bg-[var(--success)]" />
+                  </div>
                   <div className="mt-2 text-xl font-semibold">
                     {primaryAccount?.status ?? "active"}
                   </div>
@@ -334,10 +391,13 @@ export default function DashboardPage() {
                 <div className="rounded-[22px] border border-white/10 bg-white/5 p-5">
                   <div className="text-sm text-[var(--muted)]">Accounts</div>
                   <div className="mt-2 text-xl font-semibold">{accounts.length}</div>
+                  <div className="mt-1 text-xs text-[var(--muted)]">
+                    {accounts.filter(a => a.status === 'active').length} active
+                  </div>
                 </div>
 
                 <div className="rounded-[22px] border border-white/10 bg-white/5 p-5">
-                  <div className="text-sm text-[var(--muted)]">Balance</div>
+                  <div className="text-sm text-[var(--muted)]">Available balance</div>
                   <div className="mt-2 text-xl font-semibold">
                     $
                     {Number(primaryAccount?.balance ?? 0).toLocaleString(undefined, {
@@ -345,16 +405,22 @@ export default function DashboardPage() {
                       maximumFractionDigits: 2,
                     })}
                   </div>
+                  <div className="mt-1 text-xs text-[var(--muted)]">
+                    No holds
+                  </div>
                 </div>
 
                 <div className="rounded-[22px] border border-white/10 bg-white/5 p-5">
-                  <div className="text-sm text-[var(--muted)]">Yield</div>
+                  <div className="text-sm text-[var(--muted)]">Yield earned</div>
                   <div className="mt-2 text-xl font-semibold">
                     $
                     {Number(primaryAccount?.yield_earned ?? 0).toLocaleString(undefined, {
                       minimumFractionDigits: 2,
                       maximumFractionDigits: 2,
                     })}
+                  </div>
+                  <div className="mt-1 text-xs text-[var(--success)]">
+                    +4.8% APY
                   </div>
                 </div>
               </div>
