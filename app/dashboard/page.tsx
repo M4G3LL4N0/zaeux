@@ -12,7 +12,6 @@ import {
   Plus,
   ArrowDown,
   ArrowUp,
-  PieChart,
   TrendingUp,
 } from "lucide-react";
 import { Pie, Cell, ResponsiveContainer, PieChart } from "recharts";
