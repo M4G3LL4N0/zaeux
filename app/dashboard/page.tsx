@@ -408,30 +408,36 @@ export default function DashboardPage() {
                 <div className="rounded-[22px] border border-white/10 bg-white/5 p-5">
                   <div className="text-sm text-[var(--muted)]">By Account Type</div>
                   <div className="mt-4 h-[240px]">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <PieChart>
-                        <Pie
-                          data={Object.entries(
-                            accounts.reduce((acc, account) => {
-                              const type = account.account_type || 'Primary';
-                              const balance = Number(account.balance) || 0;
-                              acc[type] = (acc[type] || 0) + balance;
-                              return acc;
-                            }, {} as Record<string, number>)
-                          ).map(([name, value]) => ({ name, value }))}
-                          cx="50%"
-                          cy="50%"
-                          innerRadius={60}
-                          outerRadius={80}
-                          paddingAngle={2}
-                          dataKey="value"
-                        >
-                          {['#7dd3fc', '#c4b5fd', '#86efac', '#fca5a5'].map((color, i) => (
-                            <Cell key={`cell-${i}`} fill={color} />
-                          ))}
-                        </Pie>
-                      </RePieChart>
-                    </ResponsiveContainer>
+                    {accounts.length > 0 ? (
+                      <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                          <Pie
+                            data={Object.entries(
+                              accounts.reduce((acc, account) => {
+                                const type = account.account_type || 'Primary';
+                                const balance = Number(account.balance) || 0;
+                                acc[type] = (acc[type] || 0) + balance;
+                                return acc;
+                              }, {} as Record<string, number>)
+                            ).map(([name, value]) => ({ name, value }))}
+                            cx="50%"
+                            cy="50%"
+                            innerRadius={60}
+                            outerRadius={80}
+                            paddingAngle={2}
+                            dataKey="value"
+                          >
+                            {['#7dd3fc', '#c4b5fd', '#86efac', '#fca5a5'].map((color, i) => (
+                              <Cell key={`cell-${i}`} fill={color} />
+                            ))}
+                          </Pie>
+                        </PieChart>
+                      </ResponsiveContainer>
+                    ) : (
+                      <div className="flex h-full items-center justify-center rounded-lg bg-white/5 text-sm text-[var(--muted)]">
+                        No accounts yet
+                      </div>
+                    )}
                   </div>
                   <div className="mt-4 space-y-3">
                     {Object.entries(
