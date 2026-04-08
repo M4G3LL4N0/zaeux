@@ -15,7 +15,7 @@ import {
   PieChart,
   TrendingUp,
 } from "lucide-react";
-import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
+import { Pie, Cell, ResponsiveContainer } from "recharts";
 import { supabase } from "@/src/lib/supabase";
 
 type AccountRow = {
@@ -59,12 +59,10 @@ export default function DashboardPage() {
         setLoading(true);
         setError("");
 
-        const {
-          data: { user },
-          error: userError,
-        } = await supabase.auth.getUser();
-
-        if (userError) throw userError;
+        const { data: { user }, error: userError } = await supabase.auth.getUser();
+        if (userError || !user) {
+          throw new Error(userError?.message || "User not authenticated");
+        }
 
         if (!user) {
           if (!cancelled) {
@@ -411,7 +409,7 @@ export default function DashboardPage() {
                   <div className="text-sm text-[var(--muted)]">By Account Type</div>
                   <div className="mt-4 h-[240px]">
                     <ResponsiveContainer width="100%" height="100%">
-                      <RePieChart>
+                      <PieChart>
                         <Pie
                           data={Object.entries(
                             accounts.reduce((acc, account) => {
