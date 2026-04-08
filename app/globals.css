@@ -225,7 +225,7 @@ a {
   background: var(--panel);
   border: 1px solid var(--border);
   box-shadow: var(--shadow);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
   backdrop-filter: blur(8px);
 }
 
@@ -233,6 +233,10 @@ a {
   transform: translateY(-4px);
   box-shadow: 0 30px 60px rgba(0,0,0,0.45);
   background: var(--panel-strong);
+}
+
+#products .card:hover {
+  background: linear-gradient(135deg, var(--panel-strong), rgba(206, 222, 255, 0.03));
 }
 
 .button-primary {
