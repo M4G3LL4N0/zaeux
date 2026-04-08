@@ -340,6 +340,67 @@ export default function DashboardPage() {
 
             <div className="card rounded-[32px] p-7">
               <div className="flex items-center justify-between">
+                <div className="text-sm text-[var(--muted)]">Portfolio Allocation</div>
+              </div>
+              <div className="mt-6 grid gap-6 md:grid-cols-2">
+                <div className="rounded-[22px] border border-white/10 bg-white/5 p-5">
+                  <div className="text-sm text-[var(--muted)]">By Currency</div>
+                  <div className="mt-4 space-y-3">
+                    {Object.entries(
+                      accounts.reduce((acc, account) => {
+                        const currency = account.currency || 'USD';
+                        const balance = Number(account.balance) || 0;
+                        acc[currency] = (acc[currency] || 0) + balance;
+                        return acc;
+                      }, {} as Record<string, number>)
+                    ).map(([currency, balance]) => (
+                      <div key={currency} className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="h-2 w-2 rounded-full bg-[var(--accent)]" />
+                          <span className="text-sm">{currency}</span>
+                        </div>
+                        <div className="text-sm font-medium">
+                          ${balance.toLocaleString(undefined, {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                
+                <div className="rounded-[22px] border border-white/10 bg-white/5 p-5">
+                  <div className="text-sm text-[var(--muted)]">By Account Type</div>
+                  <div className="mt-4 space-y-3">
+                    {Object.entries(
+                      accounts.reduce((acc, account) => {
+                        const type = account.account_type || 'Primary';
+                        const balance = Number(account.balance) || 0;
+                        acc[type] = (acc[type] || 0) + balance;
+                        return acc;
+                      }, {} as Record<string, number>)
+                    ).map(([type, balance]) => (
+                      <div key={type} className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="h-2 w-2 rounded-full bg-[var(--accent-2)]" />
+                          <span className="text-sm">{type}</span>
+                        </div>
+                        <div className="text-sm font-medium">
+                          ${balance.toLocaleString(undefined, {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="card rounded-[32px] p-7">
+              <div className="flex items-center justify-between">
                 <div className="text-sm text-[var(--muted)]">Quick actions</div>
               </div>
               <div className="mt-6 grid grid-cols-4 gap-4">
