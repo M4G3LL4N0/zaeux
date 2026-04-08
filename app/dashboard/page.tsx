@@ -13,7 +13,9 @@ import {
   ArrowDown,
   ArrowUp,
   PieChart,
+  TrendingUp,
 } from "lucide-react";
+import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 import { supabase } from "@/src/lib/supabase";
 
 type AccountRow = {
@@ -341,10 +343,40 @@ export default function DashboardPage() {
             <div className="card rounded-[32px] p-7">
               <div className="flex items-center justify-between">
                 <div className="text-sm text-[var(--muted)]">Portfolio Allocation</div>
+                <div className="flex items-center gap-2 text-sm text-[var(--success)]">
+                  <TrendingUp size={16} />
+                  <span>+4.8% APY</span>
+                </div>
               </div>
               <div className="mt-6 grid gap-6 md:grid-cols-2">
                 <div className="rounded-[22px] border border-white/10 bg-white/5 p-5">
                   <div className="text-sm text-[var(--muted)]">By Currency</div>
+                  <div className="mt-4 h-[240px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={Object.entries(
+                            accounts.reduce((acc, account) => {
+                              const currency = account.currency || 'USD';
+                              const balance = Number(account.balance) || 0;
+                              acc[currency] = (acc[currency] || 0) + balance;
+                              return acc;
+                            }, {} as Record<string, number>)
+                          ).map(([name, value]) => ({ name, value }))}
+                          cx="50%"
+                          cy="50%"
+                          innerRadius={60}
+                          outerRadius={80}
+                          paddingAngle={2}
+                          dataKey="value"
+                        >
+                          {['#7dd3fc', '#c4b5fd', '#86efac', '#fca5a5'].map((color, i) => (
+                            <Cell key={`cell-${i}`} fill={color} />
+                          ))}
+                        </Pie>
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
                   <div className="mt-4 space-y-3">
                     {Object.entries(
                       accounts.reduce((acc, account) => {
@@ -353,10 +385,15 @@ export default function DashboardPage() {
                         acc[currency] = (acc[currency] || 0) + balance;
                         return acc;
                       }, {} as Record<string, number>)
-                    ).map(([currency, balance]) => (
+                    ).map(([currency, balance], i) => (
                       <div key={currency} className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                          <div className="h-2 w-2 rounded-full bg-[var(--accent)]" />
+                          <div 
+                            className="h-2 w-2 rounded-full" 
+                            style={{ 
+                              backgroundColor: ['#7dd3fc', '#c4b5fd', '#86efac', '#fca5a5'][i % 4]
+                            }} 
+                          />
                           <span className="text-sm">{currency}</span>
                         </div>
                         <div className="text-sm font-medium">
@@ -372,6 +409,32 @@ export default function DashboardPage() {
                 
                 <div className="rounded-[22px] border border-white/10 bg-white/5 p-5">
                   <div className="text-sm text-[var(--muted)]">By Account Type</div>
+                  <div className="mt-4 h-[240px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <RePieChart>
+                        <Pie
+                          data={Object.entries(
+                            accounts.reduce((acc, account) => {
+                              const type = account.account_type || 'Primary';
+                              const balance = Number(account.balance) || 0;
+                              acc[type] = (acc[type] || 0) + balance;
+                              return acc;
+                            }, {} as Record<string, number>)
+                          ).map(([name, value]) => ({ name, value }))}
+                          cx="50%"
+                          cy="50%"
+                          innerRadius={60}
+                          outerRadius={80}
+                          paddingAngle={2}
+                          dataKey="value"
+                        >
+                          {['#7dd3fc', '#c4b5fd', '#86efac', '#fca5a5'].map((color, i) => (
+                            <Cell key={`cell-${i}`} fill={color} />
+                          ))}
+                        </Pie>
+                      </RePieChart>
+                    </ResponsiveContainer>
+                  </div>
                   <div className="mt-4 space-y-3">
                     {Object.entries(
                       accounts.reduce((acc, account) => {
@@ -380,10 +443,15 @@ export default function DashboardPage() {
                         acc[type] = (acc[type] || 0) + balance;
                         return acc;
                       }, {} as Record<string, number>)
-                    ).map(([type, balance]) => (
+                    ).map(([type, balance], i) => (
                       <div key={type} className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                          <div className="h-2 w-2 rounded-full bg-[var(--accent-2)]" />
+                          <div 
+                            className="h-2 w-2 rounded-full" 
+                            style={{ 
+                              backgroundColor: ['#7dd3fc', '#c4b5fd', '#86efac', '#fca5a5'][i % 4]
+                            }} 
+                          />
                           <span className="text-sm">{type}</span>
                         </div>
                         <div className="text-sm font-medium">
