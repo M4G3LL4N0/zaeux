@@ -1,9 +1,14 @@
+import { Sparkles } from "lucide-react";
+
 export default function CorePage() {
   return (
     <main className="min-h-screen px-6 py-16">
       <div className="mx-auto max-w-6xl">
         <div className="card rounded-[36px] p-8 md:p-12">
-          <div className="badge">Zaeux Core</div>
+          <div className="badge">
+            <Sparkles size={14} />
+            Zaeux Core
+          </div>
           <h1 className="section-title mt-5">
             Infrastructure for
             <br />

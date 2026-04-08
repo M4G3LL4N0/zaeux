@@ -95,9 +95,16 @@ export function WaitlistForm() {
       <button
         type="submit"
         disabled={status === "loading"}
-        className="button-primary mt-4 w-full justify-center"
+        className="button-primary mt-4 w-full justify-center transition-all"
       >
-        {status === "loading" ? "Submitting..." : "Join waitlist"}
+        {status === "loading" ? (
+          <span className="inline-flex items-center gap-2">
+            <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+            Submitting...
+          </span>
+        ) : (
+          "Join waitlist"
+        )}
       </button>
 
       {status === "success" && (

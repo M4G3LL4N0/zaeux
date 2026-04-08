@@ -41,7 +41,7 @@ export function Nav() {
           <Link href="/dashboard" className="button-secondary">
             Preview product
           </Link>
-          <a href="#cta" className="button-primary">
+          <a href="#waitlist" className="button-primary">
             Join waitlist
           </a>
 
