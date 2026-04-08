@@ -15,31 +15,31 @@ import {
   PieChart,
   TrendingUp,
 } from "lucide-react";
-import { Pie, Cell, ResponsiveContainer } from "recharts";
+import { Pie, Cell, ResponsiveContainer, PieChart } from "recharts";
 import { supabase } from "@/src/lib/supabase";
 
-type AccountRow = {
+interface AccountRow {
   id: string;
   user_id: string;
   account_type?: string | null;
   currency?: string | null;
-  balance?: string | number | null;
-  yield_earned?: string | number | null;
+  balance?: number | null;
+  yield_earned?: number | null;
   status?: string | null;
   created_at?: string | null;
-};
+}
 
-type TransactionRow = {
+interface TransactionRow {
   id: string;
   user_id: string;
   account_id?: string | null;
-  amount?: string | number | null;
+  amount?: number | null;
   currency?: string | null;
-  type?: string | null;
+  type?: 'credit' | 'debit' | null;
   status?: string | null;
   description?: string | null;
   created_at?: string | null;
-};
+}
 
 export default function DashboardPage() {
   const router = useRouter();
